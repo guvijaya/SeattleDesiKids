@@ -1,0 +1,78 @@
+---
+import { LANGUAGES, type LangCode } from '../utils/languages';
+
+interface Props {
+  content: string | null;
+  currentLang: LangCode;
+  availableLanguages: LangCode[];
+  slug: string;
+}
+
+const { content, currentLang, availableLanguages, slug } = Astro.props;
+const langInfo = LANGUAGES[currentLang];
+const isAvailable = availableLanguages.includes(currentLang);
+---
+
+{isAvailable && content ? (
+  <article class="prose" lang={langInfo.htmlLang}>
+    <div set:html={content} />
+  </article>
+) : (
+  <div class="translation-unavailable">
+    <!-- Pencil sketch of a child writing -->
+    <div class="unavailable-icon">
+      <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <circle cx="40" cy="20" r="12" stroke="#6B6560" stroke-width="1.5" fill="none"/>
+        <path d="M28 32 Q40 28 52 32 L56 70 Q40 75 24 70 Z" stroke="#6B6560" stroke-width="1.5" fill="none"/>
+        <line x1="30" y1="45" x2="50" y2="45" stroke="#6B6560" stroke-width="1.2" stroke-linecap="round"/>
+        <line x1="30" y1="52" x2="50" y2="52" stroke="#6B6560" stroke-width="1.2" stroke-linecap="round"/>
+        <path d="M52 40 L60 32 L64 36 L56 44 Z" stroke="#6B6560" stroke-width="1.2" fill="none"/>
+        <line x1="60" y1="32" x2="64" y2="28" stroke="#6B6560" stroke-width="1" stroke-linecap="round"/>
+      </svg>
+    </div>
+
+    <p class="unavailable-message-en">
+      This essay hasn't been translated to <strong>{langInfo.label}</strong> yet.
+    </p>
+    <p class="unavailable-message-native" lang={langInfo.htmlLang}>
+      {langInfo.unavailableMessage}
+    </p>
+
+    {availableLanguages.length > 0 && (
+      <div>
+        <p class="available-in">Read it in:</p>
+        <div class="available-links">
+          {availableLanguages.map(lang => (
+            <a
+              href={`/essays/${slug}/${lang}`}
+              class="available-lang-pill"
+              style={`--pill-color: ${LANGUAGES[lang].color}`}
+            >
+              {LANGUAGES[lang].nativeLabel}
+            </a>
+          ))}
+        </div>
+      </div>
+    )}
+  </div>
+)}
+
+<style>
+  .available-lang-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.375rem 0.875rem;
+    border-radius: 100px;
+    font-family: 'Nunito', sans-serif;
+    font-size: var(--text-sm);
+    font-weight: 700;
+    background: color-mix(in srgb, var(--pill-color) 12%, transparent);
+    color: var(--pill-color);
+    border: 1.5px solid color-mix(in srgb, var(--pill-color) 30%, transparent);
+    transition: background-color var(--transition-fast);
+  }
+
+  .available-lang-pill:hover {
+    background: color-mix(in srgb, var(--pill-color) 20%, transparent);
+  }
+</style>

@@ -1,0 +1,45 @@
+{
+  "slug": "get-started",
+  "englishTitle": "Get Started",
+  "displayTitles": {
+    "hindi": "हो जाओ शुरू - Get started",
+    "telugu": "ఆరంభించు - Get started",
+    "marathi": "आरंभ करा!",
+    "kannada": "ಪ್ರಾರಂಭಿಸಿದೆವು - Getting Started"
+  },
+  "availableLanguages": [
+    "hindi",
+    "telugu",
+    "marathi",
+    "kannada"
+  ],
+  "originalAuthor": "Guruprasad Vijayarao",
+  "translators": {
+    "hindi": {
+      "name": "Rahul Upadhyaya",
+      "blog": "https://nanhihindi.blogspot.com"
+    },
+    "telugu": {
+      "name": "Pavan Kumar Yerravelly",
+      "blog": "https://seattletelugukids.blogspot.com"
+    },
+    "marathi": {
+      "name": "Mahesh Deshpande",
+      "blog": "https://seattlemarathi.blogspot.com"
+    },
+    "kannada": {
+      "name": "Naraya",
+      "blog": "https://muddadakannada.blogspot.com"
+    }
+  },
+  "illustrations": [],
+  "tags": [],
+  "sourceUrls": {
+    "hindi": "https://nanhihindi.blogspot.com/2023/12/blog-post_34.html",
+    "telugu": "https://seattletelugukids.blogspot.com/2025/01/get-started.html",
+    "marathi": "https://seattlemarathi.blogspot.com/2024/09/blog-post_83.html",
+    "kannada": "https://muddadakannada.blogspot.com/2023/05/blog-post_25.html"
+  },
+  "publishedDate": "2026-02-28",
+  "lastUpdated": "2026-02-28"
+}

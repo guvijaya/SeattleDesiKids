@@ -1,0 +1,58 @@
+{
+  "slug": "school-bus",
+  "englishTitle": "School Bus",
+  "displayTitles": {
+    "tamil": "பள்ளிப் பேருந்து",
+    "english": "School Bus",
+    "hindi": "स्कूल बस - school bus",
+    "telugu": "స్కూల్ బస్సు - school bus",
+    "marathi": "स्कूल बस - school bus",
+    "kannada": "ಶಾಲಾ ಬಸ್ - School Bus"
+  },
+  "availableLanguages": [
+    "tamil",
+    "english",
+    "hindi",
+    "telugu",
+    "marathi",
+    "kannada"
+  ],
+  "originalAuthor": "Guruprasad Vijayarao",
+  "translators": {
+    "tamil": {
+      "name": "Guruprasad Vijayarao",
+      "blog": ""
+    },
+    "english": {
+      "name": "Jayanthi Gowrishankaran",
+      "blog": "https://seattledesikids.blogspot.com"
+    },
+    "hindi": {
+      "name": "Rahul Upadhyaya",
+      "blog": "https://nanhihindi.blogspot.com"
+    },
+    "telugu": {
+      "name": "Pavan Kumar Yerravelly",
+      "blog": "https://seattletelugukids.blogspot.com"
+    },
+    "marathi": {
+      "name": "Mahesh Deshpande",
+      "blog": "https://seattlemarathi.blogspot.com"
+    },
+    "kannada": {
+      "name": "Naraya",
+      "blog": "https://muddadakannada.blogspot.com"
+    }
+  },
+  "illustrations": [],
+  "tags": [],
+  "sourceUrls": {
+    "english": "https://seattledesikids.blogspot.com/2022/11/school-bus.html",
+    "hindi": "https://nanhihindi.blogspot.com/2023/12/blog-post_38.html",
+    "telugu": "https://seattletelugukids.blogspot.com/2024/10/school-bus.html",
+    "marathi": "https://seattlemarathi.blogspot.com/2024/09/hello-world.html",
+    "kannada": "https://muddadakannada.blogspot.com/2023/06/blog-post_94.html"
+  },
+  "publishedDate": "2026-02-28",
+  "lastUpdated": "2026-02-28"
+}

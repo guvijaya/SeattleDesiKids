@@ -1,0 +1,58 @@
+{
+  "slug": "birthday-party",
+  "englishTitle": "Birthday Party",
+  "displayTitles": {
+    "tamil": "பிறந்தநாள் கொண்டாட்டங்கள்",
+    "english": "Birthday Party",
+    "hindi": "जन्मदिन की पार्टी  Birthday Party",
+    "telugu": "పుట్టినరోజు వేడుక - Birthday Party",
+    "marathi": "माझा वाढदिवस",
+    "kannada": "ಜನ್ಮದಿನದ ಆಚರಣೆ - Birthday Parties"
+  },
+  "availableLanguages": [
+    "tamil",
+    "english",
+    "hindi",
+    "telugu",
+    "marathi",
+    "kannada"
+  ],
+  "originalAuthor": "Guruprasad Vijayarao",
+  "translators": {
+    "tamil": {
+      "name": "Guruprasad Vijayarao",
+      "blog": ""
+    },
+    "english": {
+      "name": "Jayanthi Gowrishankaran",
+      "blog": "https://seattledesikids.blogspot.com"
+    },
+    "hindi": {
+      "name": "Rahul Upadhyaya",
+      "blog": "https://nanhihindi.blogspot.com"
+    },
+    "telugu": {
+      "name": "Pavan Kumar Yerravelly",
+      "blog": "https://seattletelugukids.blogspot.com"
+    },
+    "marathi": {
+      "name": "Mahesh Deshpande",
+      "blog": "https://seattlemarathi.blogspot.com"
+    },
+    "kannada": {
+      "name": "Naraya",
+      "blog": "https://muddadakannada.blogspot.com"
+    }
+  },
+  "illustrations": [],
+  "tags": [],
+  "sourceUrls": {
+    "english": "https://seattledesikids.blogspot.com/2022/11/birthday-party.html",
+    "hindi": "https://nanhihindi.blogspot.com/2023/12/blog-post_85.html",
+    "telugu": "https://seattletelugukids.blogspot.com/2024/11/birthday-party.html",
+    "marathi": "https://seattlemarathi.blogspot.com/2025/03/blog-post_9.html",
+    "kannada": "https://muddadakannada.blogspot.com/2023/06/blog-post_18.html"
+  },
+  "publishedDate": "2026-02-28",
+  "lastUpdated": "2026-02-28"
+}

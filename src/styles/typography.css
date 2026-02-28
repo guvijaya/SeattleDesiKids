@@ -1,0 +1,115 @@
+/* ============================================
+   TYPOGRAPHY — Prose & UI Font Styles
+   ============================================ */
+
+/* Prose container for essay body text */
+.prose {
+  font-family: 'Lora', 'Georgia', serif;
+  font-size: var(--text-base);
+  line-height: var(--reader-line-height);
+  color: var(--color-text-primary);
+  max-width: var(--reader-width);
+  margin-inline: auto;
+}
+
+.prose p {
+  margin-bottom: 1.5em;
+}
+
+.prose p:last-child {
+  margin-bottom: 0;
+}
+
+.prose h1, .prose h2, .prose h3 {
+  font-family: 'Nunito', system-ui, sans-serif;
+  font-weight: 700;
+  line-height: 1.3;
+  margin-top: 2em;
+  margin-bottom: 0.75em;
+  color: var(--color-text-primary);
+}
+
+.prose h1 { font-size: var(--text-3xl); }
+.prose h2 { font-size: var(--text-2xl); }
+.prose h3 { font-size: var(--text-xl); }
+
+.prose strong {
+  font-weight: 700;
+}
+
+.prose em {
+  font-style: italic;
+}
+
+.prose ul, .prose ol {
+  list-style: revert;
+  padding-left: 1.5em;
+  margin-bottom: 1.5em;
+}
+
+.prose li {
+  margin-bottom: 0.5em;
+}
+
+.prose a {
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  transition: text-decoration-color var(--transition-fast);
+}
+
+.prose a:hover {
+  text-decoration-color: var(--color-accent);
+}
+
+.prose blockquote {
+  border-left: 3px solid var(--color-accent);
+  padding-left: var(--space-md);
+  margin-left: 0;
+  color: var(--color-text-secondary);
+  font-style: italic;
+}
+
+/* Language-specific font overrides */
+.lang-hi .prose,
+.lang-mr .prose {
+  font-family: 'Noto Serif Devanagari', serif;
+  line-height: 1.9;
+}
+
+.lang-te .prose {
+  font-family: 'Noto Serif Telugu', serif;
+  line-height: 1.9;
+}
+
+.lang-kn .prose {
+  font-family: 'Noto Serif Kannada', serif;
+  line-height: 1.9;
+}
+
+/* Essay title on reader page */
+.essay-title {
+  font-family: 'Nunito', system-ui, sans-serif;
+  font-size: var(--text-3xl);
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-sm);
+}
+
+.essay-subtitle {
+  font-family: 'Nunito', system-ui, sans-serif;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  font-weight: 400;
+}
+
+/* Homepage section headings */
+.section-heading {
+  font-family: 'Nunito', system-ui, sans-serif;
+  font-size: var(--text-2xl);
+  font-weight: 800;
+  color: var(--color-text-primary);
+  margin-bottom: var(--space-lg);
+}

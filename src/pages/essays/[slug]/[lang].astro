@@ -1,0 +1,181 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import LanguageSwitcher from '../../../components/LanguageSwitcher.astro';
+import EssayContent from '../../../components/EssayContent.astro';
+import PencilIllustration from '../../../components/PencilIllustration.astro';
+import AccessGate from '../../../components/AccessGate.astro';
+import MarkAsRead from '../../../components/MarkAsRead.astro';
+import Comments from '../../../components/Comments.astro';
+import { LANGUAGES, LANGUAGE_ORDER, type LangCode } from '../../../utils/languages';
+import { FREE_ESSAY_SLUGS } from '../../../lib/freeEssays';
+import fs from 'node:fs';
+import path from 'node:path';
+import { marked } from 'marked';
+
+export async function getStaticPaths() {
+  const essaysDir = path.join(process.cwd(), 'src', 'content', 'essays');
+
+  if (!fs.existsSync(essaysDir)) {
+    return [];
+  }
+
+  const paths = [];
+  const slugDirs = fs.readdirSync(essaysDir).filter(name =>
+    fs.statSync(path.join(essaysDir, name)).isDirectory()
+  );
+
+  for (const slug of slugDirs) {
+    const metaPath = path.join(essaysDir, slug, 'metadata.json');
+    if (!fs.existsSync(metaPath)) continue;
+
+    const meta = JSON.parse(fs.readFileSync(metaPath, 'utf-8'));
+    const availableLanguages: LangCode[] = meta.availableLanguages || [];
+
+    // Generate one route per language (including unavailable ones for graceful fallback)
+    for (const lang of LANGUAGE_ORDER) {
+      paths.push({
+        params: { slug, lang },
+        props: { meta, availableLanguages, currentLang: lang as LangCode },
+      });
+    }
+  }
+
+  return paths;
+}
+
+const { slug, lang } = Astro.params;
+const { meta, availableLanguages, currentLang } = Astro.props;
+
+// Load the markdown content for the current language
+const essaysDir = path.join(process.cwd(), 'src', 'content', 'essays');
+const mdPath = path.join(essaysDir, slug, `${currentLang}.md`);
+
+let htmlContent: string | null = null;
+let essayTitle = meta.englishTitle;
+let translator: string | null = null;
+
+if (fs.existsSync(mdPath)) {
+  // Normalize line endings to \n before parsing
+  const raw = fs.readFileSync(mdPath, 'utf-8').replace(/\r\n/g, '\n');
+
+  // Extract frontmatter (--- ... ---)
+  const fmMatch = raw.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
+  if (fmMatch) {
+    const frontmatter = fmMatch[1];
+    const body = fmMatch[2].trim();
+
+    // Parse title from frontmatter for display
+    const titleMatch = frontmatter.match(/^title:\s*["']?(.+?)["']?\s*$/m);
+    if (titleMatch && currentLang !== 'english') essayTitle = titleMatch[1];
+
+    // Parse translator name
+    const translatorMatch = frontmatter.match(/^translator:\s*["']?(.+?)["']?\s*$/m);
+    if (translatorMatch) translator = translatorMatch[1];
+
+    // Convert markdown to HTML
+    htmlContent = await marked(body);
+  } else {
+    htmlContent = await marked(raw.trim());
+  }
+}
+
+// Build the canonical URL (point to English version)
+const canonicalLang = availableLanguages.includes('english') ? 'english' : availableLanguages[0];
+const canonicalUrl = canonicalLang ? `https://seattledesikids.com/essays/${slug}/${canonicalLang}` : undefined;
+
+// Description for SEO
+const description = `${meta.englishTitle} — children's essay in ${LANGUAGES[currentLang].label}. ${meta.availableLanguages?.length || 0} languages available.`;
+
+// Load additional fonts for non-Latin scripts
+const langFont = LANGUAGES[currentLang].font;
+const additionalFonts = langFont ? [`${langFont.replace(/ /g, '+')}:wght@400;600`] : [];
+
+const langInfo = LANGUAGES[currentLang];
+const isFree = FREE_ESSAY_SLUGS.includes(slug);
+---
+
+<BaseLayout
+  title={meta.englishTitle}
+  description={description}
+  lang={langInfo.htmlLang}
+  langClass={`lang-${currentLang}`}
+  canonicalUrl={canonicalUrl}
+  additionalFonts={additionalFonts}
+>
+  <div class="container reader-page">
+
+    <!-- Language Switcher -->
+    <LanguageSwitcher
+      currentLang={currentLang}
+      slug={slug}
+      availableLanguages={availableLanguages}
+    />
+
+    <!-- Essay Header -->
+    <header class="reader-header">
+      <h1 class="essay-title" lang={langInfo.htmlLang}>{essayTitle}</h1>
+      {translator && (
+        <p class="essay-translator">{currentLang === 'tamil' ? '' : currentLang === 'english' ? 'by ' : 'Translated by '}{translator}</p>
+      )}
+    </header>
+
+    <!-- Illustration -->
+    <div class="reader-illustration">
+      <PencilIllustration slug={slug} variant={1} />
+    </div>
+
+    <!-- Essay Body (with access gate for non-free essays) -->
+    <div class="reader-body">
+      <AccessGate slug={slug} isFree={isFree}>
+        <EssayContent
+          content={htmlContent}
+          currentLang={currentLang}
+          availableLanguages={availableLanguages}
+          slug={slug}
+        />
+      </AccessGate>
+    </div>
+
+    <!-- Mark as Read widget (logged-in users only) -->
+    <MarkAsRead slug={slug} lang={currentLang} />
+
+    <!-- Approved reader comments -->
+    <Comments slug={slug} />
+
+    <!-- Navigation between essays -->
+    <nav class="essay-nav" aria-label="Essay navigation">
+      <a href="/" class="essay-nav-link">← All Essays</a>
+    </nav>
+
+  </div>
+</BaseLayout>
+
+<style>
+  .essay-translator {
+    font-family: 'Nunito', sans-serif;
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    margin-top: 0.35rem;
+    text-align: center;
+  }
+
+  .essay-nav {
+    max-width: var(--reader-width);
+    margin-inline: auto;
+    margin-top: var(--space-xl);
+    padding-top: var(--space-lg);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .essay-nav-link {
+    font-family: 'Nunito', sans-serif;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    transition: color var(--transition-fast);
+  }
+
+  .essay-nav-link:hover {
+    color: var(--color-accent);
+  }
+</style>

@@ -1,0 +1,1008 @@
+---
+interface Props {
+  slug: string;
+  variant?: 1 | 2;
+  class?: string;
+}
+
+const { slug, variant = 1, class: className } = Astro.props;
+
+// Direct slug → scene mapping (checked first, most specific)
+const slugSceneMap: Record<string, string> = {
+  'escape-room':            'escape',
+  'halloween':              'halloween',
+  'idylwood-beach-park':    'beach',
+  'marymoor-park':          'football',
+  'potluck':                'potluck',
+  'sammamish-river-trail':  'riverside',
+  'boat-ride':              'boat',
+  'farmers-market':         'market',
+  'train-journey':          'monorail',
+  'train':                  'longtrain',
+  'school-bus':             'transport',
+  'birthday-party':         'celebration',
+  'gardening':              'garden',
+  'sammamish-lake-trail':   'laketrail',
+  'franklin-falls':         'waterfall',
+  'sunrise-mt-rainier':     'nature',
+  'snow-day':               'snow',
+  'an-outing':              'trail',
+  'get-started':            'phone',
+  'higher-secondary-schools-world-language-credits': 'school',
+};
+
+function getScene(slug: string): string {
+  if (slugSceneMap[slug]) return slugSceneMap[slug];
+  if (/boat|ride/i.test(slug)) return 'boat';
+  if (/market|farmer/i.test(slug)) return 'market';
+  if (/escape/i.test(slug)) return 'escape';
+  if (/halloween/i.test(slug)) return 'halloween';
+  if (/beach|idyl/i.test(slug)) return 'beach';
+  if (/marymoor|football/i.test(slug)) return 'football';
+  if (/potluck/i.test(slug)) return 'potluck';
+  if (/river.*trail|riverside/i.test(slug)) return 'riverside';
+  if (/sunrise|mountain|rainier|falls|franklin|lake|sammamish|snow/i.test(slug)) return 'nature';
+  if (/trail|path|walk|hike/i.test(slug)) return 'trail';
+  if (/train|bus|journey|travel/i.test(slug)) return 'transport';
+  if (/garden|park|flower/i.test(slug)) return 'garden';
+  if (/birthday|party|celebration/i.test(slug)) return 'celebration';
+  if (/school|language|credit|learn|study/i.test(slug)) return 'school';
+  return 'book';
+}
+
+const scene = getScene(slug);
+
+const svgMap: Record<string, string> = {
+
+  escape: `<svg viewBox="0 0 400 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="400" height="200" fill="white"/>
+    <!-- Room walls -->
+    <rect x="60" y="30" width="280" height="155" rx="4" stroke="#6B6560" stroke-width="1.5" fill="white"/>
+    <!-- Floor line -->
+    <line x1="60" y1="155" x2="340" y2="155" stroke="#6B6560" stroke-width="1.2"/>
+    <!-- Door frame -->
+    <rect x="155" y="75" width="90" height="80" rx="3" stroke="#6B6560" stroke-width="2" fill="#F5F3EF"/>
+    <!-- Door panels -->
+    <rect x="163" y="83" width="33" height="30" rx="2" stroke="#6B6560" stroke-width="1" fill="none"/>
+    <rect x="204" y="83" width="33" height="30" rx="2" stroke="#6B6560" stroke-width="1" fill="none"/>
+    <rect x="163" y="120" width="33" height="28" rx="2" stroke="#6B6560" stroke-width="1" fill="none"/>
+    <rect x="204" y="120" width="33" height="28" rx="2" stroke="#6B6560" stroke-width="1" fill="none"/>
+    <!-- Door knob -->
+    <circle cx="238" cy="115" r="5" stroke="#D97706" stroke-width="1.5" fill="none"/>
+    <line x1="238" y1="120" x2="238" y2="125" stroke="#D97706" stroke-width="1.5" stroke-linecap="round"/>
+    <!-- Padlock on door -->
+    <rect x="183" y="107" width="34" height="26" rx="3" stroke="#D97706" stroke-width="1.5" fill="white"/>
+    <path d="M190 107 Q190 96 200 96 Q210 96 210 107" stroke="#D97706" stroke-width="1.5" fill="none"/>
+    <circle cx="200" cy="120" r="4" stroke="#D97706" stroke-width="1.2" fill="none"/>
+    <line x1="200" y1="124" x2="200" y2="128" stroke="#D97706" stroke-width="1.2" stroke-linecap="round"/>
+    <!-- Clock on wall (time pressure) -->
+    <circle cx="100" cy="75" r="22" stroke="#6B6560" stroke-width="1.5" fill="white"/>
+    <line x1="100" y1="75" x2="100" y2="58" stroke="#6B6560" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="100" y1="75" x2="113" y2="82" stroke="#6B6560" stroke-width="1.2" stroke-linecap="round"/>
+    <circle cx="100" cy="75" r="2" stroke="#6B6560" stroke-width="1" fill="#6B6560"/>
+    <!-- Question mark hints -->
+    <text x="295" y="85" font-size="28" stroke="#6B6560" fill="none" stroke-width="1" font-family="serif">?</text>
+    <!-- Key on floor -->
+    <circle cx="290" cy="145" r="8" stroke="#D97706" stroke-width="1.5" fill="none"/>
+    <line x1="298" y1="145" x2="315" y2="145" stroke="#D97706" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="310" y1="145" x2="310" y2="140" stroke="#D97706" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="315" y1="145" x2="315" y2="140" stroke="#D97706" stroke-width="1.2" stroke-linecap="round"/>
+    <!-- People figures -->
+    <circle cx="95" cy="120" r="7" stroke="#6B6560" stroke-width="1.2" fill="none"/>
+    <line x1="95" y1="127" x2="95" y2="148" stroke="#6B6560" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="95" y1="135" x2="84" y2="143" stroke="#6B6560" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="95" y1="135" x2="106" y2="143" stroke="#6B6560" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="95" y1="148" x2="88" y2="158" stroke="#6B6560" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="95" y1="148" x2="102" y2="158" stroke="#6B6560" stroke-width="1.2" stroke-linecap="round"/>
+  </svg>`,
+
+  halloween: `<svg viewBox="0 0 400 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="400" height="200" fill="white"/>
+    <!-- Spider web top-left -->
+    <!-- Web center at 80,60 -->
+    <line x1="80" y1="60" x2="80" y2="15" stroke="#6B6560" stroke-width="0.8"/>
+    <line x1="80" y1="60" x2="125" y2="30" stroke="#6B6560" stroke-width="0.8"/>
+    <line x1="80" y1="60" x2="130" y2="60" stroke="#6B6560" stroke-width="0.8"/>
+    <line x1="80" y1="60" x2="118" y2="88" stroke="#6B6560" stroke-width="0.8"/>
+    <line x1="80" y1="60" x2="80" y2="100" stroke="#6B6560" stroke-width="0.8"/>
+    <line x1="80" y1="60" x2="42" y2="88" stroke="#6B6560" stroke-width="0.8"/>
+    <line x1="80" y1="60" x2="30" y2="60" stroke="#6B6560" stroke-width="0.8"/>
+    <line x1="80" y1="60" x2="35" y2="30" stroke="#6B6560" stroke-width="0.8"/>
+    <!-- Web rings -->
+    <path d="M80 75 Q90 65 96 60 Q90 55 80 45 Q70 55 64 60 Q70 65 80 75 Z" stroke="#6B6560" stroke-width="0.8" fill="none"/>
+    <path d="M80 90 Q102 74 113 60 Q102 46 80 30 Q58 46 47 60 Q58 74 80 90 Z" stroke="#6B6560" stroke-width="0.8" fill="none"/>
+    <path d="M80 105 Q115 83 128 60 Q115 37 80 15 Q45 37 32 60 Q45 83 80 105 Z" stroke="#6B6560" stroke-width="0.8" fill="none"/>
+    <!-- Spider on web -->
+    <ellipse cx="96" cy="47" rx="5" ry="4" stroke="#6B6560" stroke-width="1.2" fill="white"/>
+    <circle cx="96" cy="42" r="3" stroke="#6B6560" stroke-width="1" fill="white"/>
+    <line x1="91" y1="46" x2="85" y2="42" stroke="#6B6560" stroke-width="0.8"/>
+    <line x1="91" y1="48" x2="84" y2="48" stroke="#6B6560" stroke-width="0.8"/>
+    <line x1="91" y1="50" x2="85" y2="54" stroke="#6B6560" stroke-width="0.8"/>
+    <line x1="101" y1="46" x2="107" y2="42" stroke="#6B6560" stroke-width="0.8"/>
+    <line x1="101" y1="48" x2="108" y2="48" stroke="#6B6560" stroke-width="0.8"/>
+    <line x1="101" y1="50" x2="107" y2="54" stroke="#6B6560" stroke-width="0.8"/>
+    <!-- Jack-o-lantern left -->
+    <ellipse cx="180" cy="145" rx="38" ry="35" stroke="#D97706" stroke-width="1.5" fill="white"/>
+    <!-- Stem -->
+    <path d="M180 110 Q183 100 190 98 Q185 102 183 110" stroke="#6B6560" stroke-width="1.2" fill="none"/>
+    <!-- Eyes -->
+    <path d="M163 138 L168 130 L173 138 Z" stroke="#6B6560" stroke-width="1.2" fill="none"/>
+    <path d="M187 138 L192 130 L197 138 Z" stroke="#6B6560" stroke-width="1.2" fill="none"/>
+    <!-- Nose -->
+    <path d="M178 145 L180 140 L182 145 Z" stroke="#6B6560" stroke-width="1" fill="none"/>
+    <!-- Mouth -->
+    <path d="M163 153 L168 160 L175 153 L182 160 L189 153 L195 160 L200 153" stroke="#6B6560" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+    <!-- Ghost -->
+    <path d="M280 50 Q280 30 300 30 Q320 30 320 50 L320 90 Q315 85 310 90 Q305 95 300 90 Q295 95 290 90 Q285 85 280 90 Z" stroke="#6B6560" stroke-width="1.2" fill="white"/>
+    <circle cx="294" cy="58" r="4" stroke="#6B6560" stroke-width="1" fill="#6B6560"/>
+    <circle cx="306" cy="58" r="4" stroke="#6B6560" stroke-width="1" fill="#6B6560"/>
+    <path d="M293 70 Q300 75 307 70" stroke="#6B6560" stroke-width="1" fill="none"/>
+    <!-- Bat -->
+    <ellipse cx="340" cy="120" rx="8" ry="5" stroke="#6B6560" stroke-width="1.2" fill="white"/>
+    <path d="M332 120 Q320 110 315 118" stroke="#6B6560" stroke-width="1.2" fill="none"/>
+    <path d="M348 120 Q360 110 365 118" stroke="#6B6560" stroke-width="1.2" fill="none"/>
+    <line x1="336" y1="125" x2="333" y2="132" stroke="#6B6560" stroke-width="1" stroke-linecap="round"/>
+    <line x1="344" y1="125" x2="347" y2="132" stroke="#6B6560" stroke-width="1" stroke-linecap="round"/>
+    <!-- Moon -->
+    <path d="M355 35 Q370 30 375 45 Q365 40 355 35 Z" stroke="#D97706" stroke-width="1.2" fill="none"/>
+    <!-- Ground / grass -->
+    <line x1="0" y1="175" x2="400" y2="175" stroke="#6B6560" stroke-width="1"/>
+    <path d="M130 175 Q135 165 140 175" stroke="#6B6560" stroke-width="1" fill="none"/>
+    <path d="M145 175 Q150 162 155 175" stroke="#6B6560" stroke-width="1" fill="none"/>
+    <path d="M220 175 Q225 165 230 175" stroke="#6B6560" stroke-width="1" fill="none"/>
+  </svg>`,
+
+  beach: `<svg viewBox="0 0 400 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="400" height="200" fill="white"/>
+    <!-- Sky / Lake water area -->
+    <path d="M0 110 Q100 100 200 108 Q300 116 400 108 L400 200 L0 200 Z" stroke="#6B6560" stroke-width="1" fill="none"/>
+    <!-- Lake surface ripples -->
+    <path d="M20 125 Q60 118 100 125 Q140 132 180 125" stroke="#6B6560" stroke-width="0.8" fill="none"/>
+    <path d="M200 130 Q250 122 300 130 Q350 138 400 130" stroke="#6B6560" stroke-width="0.8" fill="none"/>
+    <path d="M30 145 Q80 138 130 145 Q180 152 230 145" stroke="#6B6560" stroke-width="0.8" fill="none"/>
+    <!-- Grass bank -->
+    <path d="M0 110 Q100 100 200 108 Q300 116 400 108" stroke="#6B6560" stroke-width="1.5" fill="none"/>
+    <!-- Slide structure 1 (left) -->
+    <!-- Ladder poles -->
+    <line x1="80" y1="110" x2="80" y2="45" stroke="#6B6560" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="95" y1="110" x2="95" y2="45" stroke="#6B6560" stroke-width="1.5" stroke-linecap="round"/>
+    <!-- Ladder rungs -->
+    <line x1="80" y1="55" x2="95" y2="55" stroke="#6B6560" stroke-width="1.2"/>
+    <line x1="80" y1="67" x2="95" y2="67" stroke="#6B6560" stroke-width="1.2"/>
+    <line x1="80" y1="79" x2="95" y2="79" stroke="#6B6560" stroke-width="1.2"/>
+    <line x1="80" y1="91" x2="95" y2="91" stroke="#6B6560" stroke-width="1.2"/>
+    <!-- Platform -->
+    <rect x="72" y="38" width="36" height="8" rx="2" stroke="#6B6560" stroke-width="1.2" fill="white"/>
+    <!-- Slide chute -->
+    <path d="M88 45 Q130 68 145 108" stroke="#D97706" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    <!-- Slide side rails -->
+    <path d="M82 45 Q124 68 138 108" stroke="#6B6560" stroke-width="1" fill="none"/>
+    <path d="M94 45 Q136 68 152 108" stroke="#6B6560" stroke-width="1" fill="none"/>
+    <!-- Slide structure 2 (right, taller) -->
+    <line x1="270" y1="110" x2="270" y2="30" stroke="#6B6560" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="285" y1="110" x2="285" y2="30" stroke="#6B6560" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="270" y1="42" x2="285" y2="42" stroke="#6B6560" stroke-width="1.2"/>
+    <line x1="270" y1="56" x2="285" y2="56" stroke="#6B6560" stroke-width="1.2"/>
+    <line x1="270" y1="70" x2="285" y2="70" stroke="#6B6560" stroke-width="1.2"/>
+    <line x1="270" y1="84" x2="285" y2="84" stroke="#6B6560" stroke-width="1.2"/>
+    <line x1="270" y1="98" x2="285" y2="98" stroke="#6B6560" stroke-width="1.2"/>
+    <rect x="262" y="22" width="36" height="8" rx="2" stroke="#6B6560" stroke-width="1.2" fill="white"/>
+    <!-- Slide 2 chute (curves other way) -->
+    <path d="M277 30 Q240 55 228 108" stroke="#D97706" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    <path d="M271 30 Q234 55 222 108" stroke="#6B6560" stroke-width="1" fill="none"/>
+    <path d="M283 30 Q246 55 234 108" stroke="#6B6560" stroke-width="1" fill="none"/>
+    <!-- Child on slide -->
+    <circle cx="137" cy="93" r="6" stroke="#6B6560" stroke-width="1.2" fill="none"/>
+    <!-- Trees near lake -->
+    <line x1="350" y1="110" x2="350" y2="65" stroke="#6B6560" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M335 85 L350 65 L365 85" stroke="#6B6560" stroke-width="1.2" fill="none" stroke-linejoin="round"/>
+    <path d="M338 98 L350 80 L362 98" stroke="#6B6560" stroke-width="1.2" fill="none" stroke-linejoin="round"/>
+    <!-- Sun -->
+    <circle cx="50" cy="40" r="16" stroke="#D97706" stroke-width="1.5" fill="none"/>
+    <line x1="50" y1="18" x2="50" y2="12" stroke="#D97706" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="66" y1="24" x2="70" y2="20" stroke="#D97706" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="72" y1="40" x2="78" y2="40" stroke="#D97706" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="28" y1="40" x2="22" y2="40" stroke="#D97706" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="34" y1="24" x2="30" y2="20" stroke="#D97706" stroke-width="1.2" stroke-linecap="round"/>
+    <!-- Duck on lake -->
+    <ellipse cx="320" cy="138" rx="14" ry="8" stroke="#6B6560" stroke-width="1.2" fill="white"/>
+    <circle cx="333" cy="133" r="5" stroke="#6B6560" stroke-width="1.2" fill="white"/>
+    <path d="M337 133 L342 131 L340 135 Z" stroke="#D97706" stroke-width="1" fill="none"/>
+  </svg>`,
+
+  football: `<svg viewBox="0 0 400 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="400" height="200" fill="white"/>
+    <!-- Field ground -->
+    <rect x="20" y="80" width="360" height="100" rx="4" stroke="#6B6560" stroke-width="1.2" fill="none"/>
+    <!-- Grass texture lines -->
+    <line x1="20" y1="100" x2="380" y2="100" stroke="#6B6560" stroke-width="0.5" stroke-dasharray="2 4"/>
+    <line x1="20" y1="120" x2="380" y2="120" stroke="#6B6560" stroke-width="0.5" stroke-dasharray="2 4"/>
+    <line x1="20" y1="140" x2="380" y2="140" stroke="#6B6560" stroke-width="0.5" stroke-dasharray="2 4"/>
+    <line x1="20" y1="160" x2="380" y2="160" stroke="#6B6560" stroke-width="0.5" stroke-dasharray="2 4"/>
+    <!-- Centre circle -->
+    <circle cx="200" cy="130" r="30" stroke="#6B6560" stroke-width="1.2" fill="none"/>
+    <!-- Centre line -->
+    <line x1="200" y1="80" x2="200" y2="180" stroke="#6B6560" stroke-width="1.2"/>
+    <!-- Centre dot -->
+    <circle cx="200" cy="130" r="3" stroke="#6B6560" stroke-width="1" fill="#6B6560"/>
+    <!-- Left penalty box -->
+    <rect x="20" y="100" width="60" height="60" stroke="#6B6560" stroke-width="1.2" fill="none"/>
+    <!-- Left goal box -->
+    <rect x="20" y="112" width="28" height="36" stroke="#6B6560" stroke-width="1.2" fill="none"/>
+    <!-- Left goal posts -->
+    <rect x="8" y="115" width="12" height="30" stroke="#6B6560" stroke-width="1.5" fill="none"/>
+    <!-- Right penalty box -->
+    <rect x="320" y="100" width="60" height="60" stroke="#6B6560" stroke-width="1.2" fill="none"/>
+    <!-- Right goal box -->
+    <rect x="352" y="112" width="28" height="36" stroke="#6B6560" stroke-width="1.2" fill="none"/>
+    <!-- Right goal posts -->
+    <rect x="380" y="115" width="12" height="30" stroke="#6B6560" stroke-width="1.5" fill="none"/>
+    <!-- Football -->
+    <ellipse cx="200" cy="55" rx="18" ry="13" stroke="#6B6560" stroke-width="1.5" fill="white"/>
+    <line x1="183" y1="55" x2="218" y2="55" stroke="#6B6560" stroke-width="1"/>
+    <path d="M192 43 Q200 40 208 43" stroke="#6B6560" stroke-width="0.8" fill="none"/>
+    <path d="M192 67 Q200 70 208 67" stroke="#6B6560" stroke-width="0.8" fill="none"/>
+    <path d="M184 49 Q186 55 184 61" stroke="#6B6560" stroke-width="0.8" fill="none"/>
+    <path d="M216 49 Q214 55 216 61" stroke="#6B6560" stroke-width="0.8" fill="none"/>
+    <!-- Player figures -->
+    <circle cx="150" cy="108" r="6" stroke="#6B6560" stroke-width="1.2" fill="none"/>
+    <line x1="150" y1="114" x2="150" y2="132" stroke="#6B6560" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="150" y1="120" x2="140" y2="127" stroke="#6B6560" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="150" y1="120" x2="160" y2="127" stroke="#6B6560" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="150" y1="132" x2="143" y2="145" stroke="#6B6560" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="150" y1="132" x2="157" y2="145" stroke="#6B6560" stroke-width="1.2" stroke-linecap="round"/>
+    <circle cx="255" cy="115" r="6" stroke="#6B6560" stroke-width="1.2" fill="none"/>
+    <line x1="255" y1="121" x2="255" y2="140" stroke="#6B6560" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="255" y1="128" x2="244" y2="135" stroke="#6B6560" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="255" y1="128" x2="266" y2="132" stroke="#6B6560" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="255" y1="140" x2="248" y2="152" stroke="#6B6560" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="255" y1="140" x2="262" y2="152" stroke="#6B6560" stroke-width="1.2" stroke-linecap="round"/>
+    <!-- Goalpost (upright, American football style at top) -->
+    <line x1="60" y1="20" x2="60" y2="50" stroke="#6B6560" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="42" y1="30" x2="78" y2="30" stroke="#6B6560" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="42" y1="20" x2="42" y2="30" stroke="#6B6560" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="78" y1="20" x2="78" y2="30" stroke="#6B6560" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="340" y1="20" x2="340" y2="50" stroke="#6B6560" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="322" y1="30" x2="358" y2="30" stroke="#6B6560" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="322" y1="20" x2="322" y2="30" stroke="#6B6560" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="358" y1="20" x2="358" y2="30" stroke="#6B6560" stroke-width="1.2" stroke-linecap="round"/>
+  </svg>`,
+
+  potluck: `<svg viewBox="0 0 400 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="400" height="200" fill="white"/>
+    <!-- Table -->
+    <path d="M30 135 Q200 128 370 135 L370 148 Q200 155 30 148 Z" stroke="#6B6560" stroke-width="1.5" fill="white"/>
+    <line x1="60" y1="148" x2="55" y2="185" stroke="#6B6560" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="340" y1="148" x2="345" y2="185" stroke="#6B6560" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="130" y1="150" x2="128" y2="185" stroke="#6B6560" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="270" y1="150" x2="272" y2="185" stroke="#6B6560" stroke-width="1.2" stroke-linecap="round"/>
+    <!-- Table cloth edge detail -->
+    <path d="M30 148 Q200 156 370 148" stroke="#6B6560" stroke-width="0.8" stroke-dasharray="3 3" fill="none"/>
+    <!-- Large pot / main dish (centre) -->
+    <ellipse cx="200" cy="128" rx="35" ry="12" stroke="#6B6560" stroke-width="1.2" fill="white"/>
+    <path d="M165 128 L165 112 Q200 108 235 112 L235 128" stroke="#6B6560" stroke-width="1.2" fill="white"/>
+    <ellipse cx="200" cy="112" rx="35" ry="8" stroke="#6B6560" stroke-width="1.2" fill="white"/>
+    <!-- Steam from pot -->
+    <path d="M190 108 Q188 98 192 90" stroke="#6B6560" stroke-width="1" fill="none" stroke-dasharray="2 2"/>
+    <path d="M200 106 Q198 94 202 85" stroke="#6B6560" stroke-width="1" fill="none" stroke-dasharray="2 2"/>
+    <path d="M210 108 Q208 98 212 90" stroke="#6B6560" stroke-width="1" fill="none" stroke-dasharray="2 2"/>
+    <!-- Pot handles -->
+    <path d="M165 118 Q155 115 154 122 Q155 129 165 126" stroke="#6B6560" stroke-width="1.2" fill="none"/>
+    <path d="M235 118 Q245 115 246 122 Q245 129 235 126" stroke="#6B6560" stroke-width="1.2" fill="none"/>
+    <!-- Cake / dessert (left) -->
+    <rect x="65" y="108" width="55" height="25" rx="3" stroke="#6B6560" stroke-width="1.2" fill="white"/>
+    <ellipse cx="92" cy="108" rx="27" ry="7" stroke="#6B6560" stroke-width="1.2" fill="white"/>
+    <rect x="75" y="90" width="35" height="18" rx="3" stroke="#6B6560" stroke-width="1.2" fill="white"/>
+    <ellipse cx="92" cy="90" rx="17" ry="5" stroke="#6B6560" stroke-width="1.2" fill="white"/>
+    <!-- Candles on cake -->
+    <line x1="84" y1="90" x2="84" y2="82" stroke="#6B6560" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="92" y1="90" x2="92" y2="80" stroke="#6B6560" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="100" y1="90" x2="100" y2="82" stroke="#6B6560" stroke-width="1.2" stroke-linecap="round"/>
+    <path d="M82 82 Q84 78 86 82" stroke="#D97706" stroke-width="1" fill="none"/>
+    <path d="M90 80 Q92 76 94 80" stroke="#D97706" stroke-width="1" fill="none"/>
+    <path d="M98 82 Q100 78 102 82" stroke="#D97706" stroke-width="1" fill="none"/>
+    <!-- Rice/salad bowl (right) -->
+    <path d="M280 133 Q310 125 340 133 L338 118 Q310 112 282 118 Z" stroke="#6B6560" stroke-width="1.2" fill="white"/>
+    <ellipse cx="310" cy="118" rx="28" ry="7" stroke="#6B6560" stroke-width="1.2" fill="white"/>
+    <!-- Food texture in bowl -->
+    <path d="M288 124 Q295 120 302 124" stroke="#6B6560" stroke-width="0.8" fill="none"/>
+    <path d="M305 122 Q312 118 319 122" stroke="#6B6560" stroke-width="0.8" fill="none"/>
+    <path d="M320 124 Q327 120 334 124" stroke="#6B6560" stroke-width="0.8" fill="none"/>
+    <!-- Plate with food (far left) -->
+    <ellipse cx="48" cy="133" rx="22" ry="7" stroke="#6B6560" stroke-width="1.2" fill="white"/>
+    <!-- Food items on plate -->
+    <circle cx="42" cy="131" r="4" stroke="#D97706" stroke-width="1" fill="none"/>
+    <circle cx="52" cy="130" r="4" stroke="#D97706" stroke-width="1" fill="none"/>
+    <circle cx="48" cy="136" r="4" stroke="#6B6560" stroke-width="1" fill="none"/>
+    <!-- Drinks / cups (far right) -->
+    <path d="M358 130 L355 118 L368 118 L365 130 Z" stroke="#6B6560" stroke-width="1.2" fill="white"/>
+    <line x1="355" y1="122" x2="368" y2="122" stroke="#6B6560" stroke-width="0.8"/>
+    <path d="M372 130 L369 118 L382 118 L379 130 Z" stroke="#6B6560" stroke-width="1.2" fill="white"/>
+  </svg>`,
+
+  riverside: `<svg viewBox="0 0 400 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="400" height="200" fill="white"/>
+    <!-- River (takes up bottom third) -->
+    <path d="M0 138 Q80 128 160 138 Q240 148 320 138 Q360 133 400 138 L400 200 L0 200 Z" stroke="#6B6560" stroke-width="1.2" fill="none"/>
+    <!-- River ripples -->
+    <path d="M20 152 Q60 145 100 152 Q140 159 180 152" stroke="#6B6560" stroke-width="0.8" fill="none"/>
+    <path d="M200 158 Q250 150 300 158 Q350 166 400 158" stroke="#6B6560" stroke-width="0.8" fill="none"/>
+    <path d="M40 170 Q90 163 140 170" stroke="#6B6560" stroke-width="0.7" fill="none"/>
+    <path d="M250 168 Q300 160 350 168" stroke="#6B6560" stroke-width="0.7" fill="none"/>
+    <!-- River bank / path -->
+    <path d="M0 138 Q80 128 160 138 Q240 148 320 138 Q360 133 400 138" stroke="#6B6560" stroke-width="1.5" fill="none"/>
+    <!-- Walking path along river (paved trail) -->
+    <path d="M0 118 Q80 110 160 118 Q240 126 320 118 Q360 114 400 118" stroke="#6B6560" stroke-width="1.2" stroke-dasharray="6 4" fill="none"/>
+    <!-- Path edge -->
+    <path d="M0 125 Q80 117 160 125 Q240 133 320 125 Q360 121 400 125" stroke="#6B6560" stroke-width="0.8" fill="none"/>
+    <!-- Trees along bank -->
+    <line x1="50" y1="138" x2="50" y2="88" stroke="#6B6560" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M32 108 L50 88 L68 108" stroke="#6B6560" stroke-width="1.2" fill="none" stroke-linejoin="round"/>
+    <path d="M36 122 L50 104 L64 122" stroke="#6B6560" stroke-width="1.2" fill="none" stroke-linejoin="round"/>
+    <line x1="120" y1="135" x2="120" y2="78" stroke="#6B6560" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M100 100 L120 78 L140 100" stroke="#6B6560" stroke-width="1.2" fill="none" stroke-linejoin="round"/>
+    <path d="M104 116 L120 96 L136 116" stroke="#6B6560" stroke-width="1.2" fill="none" stroke-linejoin="round"/>
+    <line x1="300" y1="130" x2="300" y2="80" stroke="#6B6560" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M282 100 L300 80 L318 100" stroke="#6B6560" stroke-width="1.2" fill="none" stroke-linejoin="round"/>
+    <path d="M286 116 L300 98 L314 116" stroke="#6B6560" stroke-width="1.2" fill="none" stroke-linejoin="round"/>
+    <line x1="370" y1="132" x2="370" y2="85" stroke="#6B6560" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M354 105 L370 85 L386 105" stroke="#6B6560" stroke-width="1.2" fill="none" stroke-linejoin="round"/>
+    <path d="M357 120 L370 102 L383 120" stroke="#6B6560" stroke-width="1.2" fill="none" stroke-linejoin="round"/>
+    <!-- Walkers on path -->
+    <circle cx="190" cy="112" r="7" stroke="#6B6560" stroke-width="1.2" fill="none"/>
+    <line x1="190" y1="119" x2="190" y2="138" stroke="#6B6560" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="190" y1="126" x2="180" y2="133" stroke="#6B6560" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="190" y1="126" x2="200" y2="130" stroke="#6B6560" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="190" y1="138" x2="183" y2="150" stroke="#6B6560" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="190" y1="138" x2="197" y2="150" stroke="#6B6560" stroke-width="1.2" stroke-linecap="round"/>
+    <!-- Cyclist -->
+    <circle cx="240" cy="118" r="7" stroke="#6B6560" stroke-width="1.2" fill="none"/>
+    <line x1="240" y1="125" x2="240" y2="135" stroke="#6B6560" stroke-width="1.5" stroke-linecap="round"/>
+    <circle cx="228" cy="140" r="6" stroke="#6B6560" stroke-width="1" fill="none"/>
+    <circle cx="252" cy="140" r="6" stroke="#6B6560" stroke-width="1" fill="none"/>
+    <line x1="228" y1="134" x2="240" y2="135" stroke="#6B6560" stroke-width="1" stroke-linecap="round"/>
+    <line x1="252" y1="134" x2="240" y2="135" stroke="#6B6560" stroke-width="1" stroke-linecap="round"/>
+    <!-- Bridge over river -->
+    <path d="M155" y1="148" x2="245" y2="148" stroke="#6B6560" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <path d="M155 148 Q200 128 245 148" stroke="#6B6560" stroke-width="1.5" fill="none"/>
+    <line x1="175" y1="138" x2="175" y2="148" stroke="#6B6560" stroke-width="1"/>
+    <line x1="200" y1="130" x2="200" y2="148" stroke="#6B6560" stroke-width="1"/>
+    <line x1="225" y1="138" x2="225" y2="148" stroke="#6B6560" stroke-width="1"/>
+    <!-- Mountain silhouette in background -->
+    <path d="M0 70 L60 20 L120 70" stroke="#6B6560" stroke-width="1" fill="none" opacity="0.4"/>
+    <path d="M100 70 L170 15 L240 70" stroke="#6B6560" stroke-width="1" fill="none" opacity="0.4"/>
+  </svg>`,
+
+  boat: `<svg viewBox="0 0 400 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="400" height="200" fill="white"/>
+    <!-- Water waves -->
+    <path d="M0 140 Q50 130 100 140 Q150 150 200 140 Q250 130 300 140 Q350 150 400 140" stroke="#6B6560" stroke-width="1.2" fill="none"/>
+    <path d="M0 155 Q50 145 100 155 Q150 165 200 155 Q250 145 300 155 Q350 165 400 155" stroke="#6B6560" stroke-width="1" fill="none"/>
+    <path d="M0 168 Q60 160 120 168 Q180 176 240 168 Q300 160 360 168 Q380 172 400 168" stroke="#6B6560" stroke-width="0.8" fill="none"/>
+    <!-- Boat hull -->
+    <path d="M100 138 Q200 155 300 138 L290 125 L110 125 Z" stroke="#6B6560" stroke-width="1.5" fill="white"/>
+    <!-- Mast -->
+    <line x1="200" y1="125" x2="200" y2="50" stroke="#6B6560" stroke-width="1.5" stroke-linecap="round"/>
+    <!-- Sail -->
+    <path d="M200 55 L200 118 L145 95 Z" stroke="#6B6560" stroke-width="1.2" fill="white"/>
+    <path d="M200 60 L200 115 L255 88 Z" stroke="#6B6560" stroke-width="1.2" fill="white"/>
+    <!-- Flag -->
+    <path d="M200 50 L220 56 L200 62" stroke="#D97706" stroke-width="1" fill="none"/>
+    <!-- People silhouettes in boat -->
+    <circle cx="165" cy="122" r="5" stroke="#6B6560" stroke-width="1.2" fill="none"/>
+    <circle cx="200" cy="122" r="5" stroke="#6B6560" stroke-width="1.2" fill="none"/>
+    <circle cx="235" cy="122" r="5" stroke="#6B6560" stroke-width="1.2" fill="none"/>
+    <!-- Sun reflection on water -->
+    <path d="M310 148 Q320 144 330 148" stroke="#D97706" stroke-width="1" fill="none"/>
+    <path d="M305 156 Q320 150 335 156" stroke="#D97706" stroke-width="0.8" fill="none"/>
+    <!-- Distant shore -->
+    <path d="M0 128 Q80 120 160 125 Q200 127 240 124 Q320 118 400 122" stroke="#6B6560" stroke-width="1" fill="none" stroke-dasharray="3 3"/>
+    <!-- Seagulls -->
+    <path d="M60 70 Q65 65 70 70" stroke="#6B6560" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+    <path d="M80 55 Q86 50 92 55" stroke="#6B6560" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+    <path d="M330 75 Q336 70 342 75" stroke="#6B6560" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+  </svg>`,
+
+  market: `<svg viewBox="0 0 400 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="400" height="200" fill="white"/>
+    <!-- Ground -->
+    <line x1="0" y1="168" x2="400" y2="168" stroke="#6B6560" stroke-width="1.2"/>
+    <!-- Stall 1 (left) -->
+    <rect x="20" y="100" width="100" height="68" stroke="#6B6560" stroke-width="1.2" fill="white"/>
+    <path d="M15 100 L120 100 L115 82 L20 82 Z" stroke="#6B6560" stroke-width="1.2" fill="white"/>
+    <line x1="15" y1="100" x2="120" y2="100" stroke="#6B6560" stroke-width="1.2"/>
+    <line x1="35" y1="82" x2="30" y2="100" stroke="#6B6560" stroke-width="0.8"/>
+    <line x1="55" y1="82" x2="50" y2="100" stroke="#6B6560" stroke-width="0.8"/>
+    <line x1="75" y1="82" x2="70" y2="100" stroke="#6B6560" stroke-width="0.8"/>
+    <line x1="95" y1="82" x2="90" y2="100" stroke="#6B6560" stroke-width="0.8"/>
+    <ellipse cx="45" cy="142" rx="18" ry="10" stroke="#D97706" stroke-width="1" fill="none"/>
+    <line x1="35" y1="132" x2="33" y2="122" stroke="#6B6560" stroke-width="1" stroke-linecap="round"/>
+    <line x1="45" y1="132" x2="45" y2="121" stroke="#6B6560" stroke-width="1" stroke-linecap="round"/>
+    <line x1="55" y1="132" x2="57" y2="122" stroke="#6B6560" stroke-width="1" stroke-linecap="round"/>
+    <circle cx="85" cy="140" r="7" stroke="#6B6560" stroke-width="1" fill="none"/>
+    <circle cx="98" cy="140" r="7" stroke="#6B6560" stroke-width="1" fill="none"/>
+    <circle cx="91" cy="130" r="7" stroke="#6B6560" stroke-width="1" fill="none"/>
+    <!-- Stall 2 (centre) -->
+    <rect x="150" y="95" width="100" height="73" stroke="#6B6560" stroke-width="1.2" fill="white"/>
+    <path d="M145 95 L255 95 L250 75 L150 75 Z" stroke="#6B6560" stroke-width="1.2" fill="white"/>
+    <line x1="145" y1="95" x2="255" y2="95" stroke="#6B6560" stroke-width="1.2"/>
+    <line x1="165" y1="75" x2="160" y2="95" stroke="#6B6560" stroke-width="0.8"/>
+    <line x1="187" y1="75" x2="182" y2="95" stroke="#6B6560" stroke-width="0.8"/>
+    <line x1="209" y1="75" x2="204" y2="95" stroke="#6B6560" stroke-width="0.8"/>
+    <line x1="231" y1="75" x2="226" y2="95" stroke="#6B6560" stroke-width="0.8"/>
+    <rect x="165" y="103" width="70" height="16" rx="2" stroke="#6B6560" stroke-width="1" fill="none"/>
+    <line x1="172" y1="111" x2="228" y2="111" stroke="#6B6560" stroke-width="1" stroke-linecap="round"/>
+    <path d="M160 148 Q168 138 176 148 Q168 155 160 148 Z" stroke="#6B6560" stroke-width="1" fill="none"/>
+    <path d="M175 145 Q183 135 191 145 Q183 152 175 145 Z" stroke="#6B6560" stroke-width="1" fill="none"/>
+    <path d="M190 148 Q198 138 206 148 Q198 155 190 148 Z" stroke="#6B6560" stroke-width="1" fill="none"/>
+    <ellipse cx="230" cy="148" rx="10" ry="8" stroke="#D97706" stroke-width="1.2" fill="none"/>
+    <ellipse cx="245" cy="150" rx="8" ry="7" stroke="#D97706" stroke-width="1.2" fill="none"/>
+    <line x1="230" y1="140" x2="232" y2="133" stroke="#6B6560" stroke-width="1" stroke-linecap="round"/>
+    <!-- Stall 3 (right) -->
+    <rect x="280" y="105" width="100" height="63" stroke="#6B6560" stroke-width="1.2" fill="white"/>
+    <path d="M275 105 L385 105 L380 87 L280 87 Z" stroke="#6B6560" stroke-width="1.2" fill="white"/>
+    <line x1="275" y1="105" x2="385" y2="105" stroke="#6B6560" stroke-width="1.2"/>
+    <line x1="298" y1="87" x2="294" y2="105" stroke="#6B6560" stroke-width="0.8"/>
+    <line x1="318" y1="87" x2="314" y2="105" stroke="#6B6560" stroke-width="0.8"/>
+    <line x1="338" y1="87" x2="334" y2="105" stroke="#6B6560" stroke-width="0.8"/>
+    <line x1="358" y1="87" x2="354" y2="105" stroke="#6B6560" stroke-width="0.8"/>
+    <path d="M295 155 Q310 148 325 155 L322 168 L298 168 Z" stroke="#6B6560" stroke-width="1.2" fill="none"/>
+    <path d="M295 155 Q310 162 325 155" stroke="#6B6560" stroke-width="1" fill="none"/>
+    <line x1="350" y1="168" x2="350" y2="130" stroke="#6B6560" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M350 148 Q362 142 368 148 Q362 154 350 148 Z" stroke="#6B6560" stroke-width="1" fill="none"/>
+    <path d="M350 135 Q340 130 335 136 Q340 142 350 135 Z" stroke="#6B6560" stroke-width="1" fill="none"/>
+    <!-- Shopper figure -->
+    <circle cx="130" cy="128" r="7" stroke="#6B6560" stroke-width="1.2" fill="none"/>
+    <line x1="130" y1="135" x2="130" y2="158" stroke="#6B6560" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="130" y1="143" x2="120" y2="152" stroke="#6B6560" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="130" y1="143" x2="142" y2="150" stroke="#6B6560" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="130" y1="158" x2="122" y2="168" stroke="#6B6560" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="130" y1="158" x2="138" y2="168" stroke="#6B6560" stroke-width="1.2" stroke-linecap="round"/>
+    <path d="M140 150 Q146 148 148 153 Q146 158 140 157 Z" stroke="#6B6560" stroke-width="1" fill="none"/>
+  </svg>`,
+
+  nature: `<svg viewBox="0 0 400 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="400" height="200" fill="white"/>
+    <path d="M0 160 L80 60 L160 160" stroke="#6B6560" stroke-width="1.5" fill="none" stroke-linejoin="round"/>
+    <path d="M120 160 L220 40 L320 160" stroke="#6B6560" stroke-width="1.5" fill="none" stroke-linejoin="round"/>
+    <path d="M260 160 L340 90 L400 160" stroke="#6B6560" stroke-width="1.5" fill="none" stroke-linejoin="round"/>
+    <path d="M80 60 L95 85 L65 85 Z" stroke="#6B6560" stroke-width="1" fill="white"/>
+    <path d="M220 40 L240 75 L200 75 Z" stroke="#6B6560" stroke-width="1" fill="white"/>
+    <circle cx="60" cy="35" r="15" stroke="#D97706" stroke-width="1.5" fill="none"/>
+    <line x1="60" y1="12" x2="60" y2="6" stroke="#D97706" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="60" y1="58" x2="60" y2="64" stroke="#D97706" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="37" y1="35" x2="31" y2="35" stroke="#D97706" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="83" y1="35" x2="89" y2="35" stroke="#D97706" stroke-width="1.2" stroke-linecap="round"/>
+    <path d="M0 165 Q100 155 200 165 Q300 175 400 165" stroke="#6B6560" stroke-width="1" fill="none"/>
+    <path d="M330 160 L330 130 M315 145 L330 130 L345 145" stroke="#6B6560" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M360 160 L360 135 M348 148 L360 135 L372 148" stroke="#6B6560" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>`,
+
+  trail: `<svg viewBox="0 0 400 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="400" height="200" fill="white"/>
+    <path d="M180 200 Q190 150 170 100 Q155 60 200 20" stroke="#6B6560" stroke-width="2" fill="none" stroke-dasharray="4 3"/>
+    <path d="M220 200 Q210 150 230 100 Q245 60 200 20" stroke="#6B6560" stroke-width="2" fill="none" stroke-dasharray="4 3"/>
+    <path d="M60 180 L60 130 M40 155 L60 130 L80 155" stroke="#6B6560" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M100 175 L100 135 M83 155 L100 135 L117 155" stroke="#6B6560" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M300 180 L300 130 M280 155 L300 130 L320 155" stroke="#6B6560" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M350 175 L350 135 M333 155 L350 135 L367 155" stroke="#6B6560" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="200" cy="100" r="8" stroke="#6B6560" stroke-width="1.2" fill="none"/>
+    <line x1="200" y1="108" x2="200" y2="135" stroke="#6B6560" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="200" y1="118" x2="188" y2="128" stroke="#6B6560" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="200" y1="118" x2="212" y2="125" stroke="#6B6560" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="200" y1="135" x2="190" y2="155" stroke="#6B6560" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="200" y1="135" x2="210" y2="155" stroke="#6B6560" stroke-width="1.2" stroke-linecap="round"/>
+  </svg>`,
+
+  transport: `<svg viewBox="0 0 400 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="400" height="200" fill="white"/>
+    <rect x="40" y="90" width="280" height="60" rx="8" stroke="#6B6560" stroke-width="1.5" fill="white"/>
+    <path d="M320 90 L350 100 L350 140 L320 150" stroke="#6B6560" stroke-width="1.5" fill="white"/>
+    <rect x="60" y="103" width="30" height="20" rx="3" stroke="#6B6560" stroke-width="1.2" fill="none"/>
+    <rect x="105" y="103" width="30" height="20" rx="3" stroke="#6B6560" stroke-width="1.2" fill="none"/>
+    <rect x="150" y="103" width="30" height="20" rx="3" stroke="#6B6560" stroke-width="1.2" fill="none"/>
+    <rect x="195" y="103" width="30" height="20" rx="3" stroke="#6B6560" stroke-width="1.2" fill="none"/>
+    <rect x="240" y="103" width="30" height="20" rx="3" stroke="#6B6560" stroke-width="1.2" fill="none"/>
+    <circle cx="100" cy="155" r="12" stroke="#6B6560" stroke-width="1.5" fill="white"/>
+    <circle cx="200" cy="155" r="12" stroke="#6B6560" stroke-width="1.5" fill="white"/>
+    <circle cx="300" cy="155" r="12" stroke="#6B6560" stroke-width="1.5" fill="white"/>
+    <line x1="0" y1="167" x2="400" y2="167" stroke="#6B6560" stroke-width="1.5"/>
+    <line x1="0" y1="172" x2="400" y2="172" stroke="#6B6560" stroke-width="1.5"/>
+    <path d="M340 90 Q345 70 355 60 Q360 50 370 55 Q380 60 375 45" stroke="#6B6560" stroke-width="1" fill="none" stroke-dasharray="2 2"/>
+    <ellipse cx="80" cy="35" rx="25" ry="12" stroke="#6B6560" stroke-width="1" fill="none"/>
+    <ellipse cx="100" cy="30" rx="20" ry="10" stroke="#6B6560" stroke-width="1" fill="none"/>
+  </svg>`,
+
+  garden: `<svg viewBox="0 0 400 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="400" height="200" fill="white"/>
+    <path d="M0 160 Q200 150 400 160" stroke="#6B6560" stroke-width="1.5" fill="none"/>
+    <line x1="80" y1="160" x2="80" y2="110" stroke="#6B6560" stroke-width="1.5" stroke-linecap="round"/>
+    <circle cx="80" cy="100" r="12" stroke="#D97706" stroke-width="1.5" fill="none"/>
+    <line x1="68" y1="100" x2="56" y2="100" stroke="#D97706" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="92" y1="100" x2="104" y2="100" stroke="#D97706" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="80" y1="88" x2="80" y2="76" stroke="#D97706" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="160" y1="160" x2="160" y2="105" stroke="#6B6560" stroke-width="1.5" stroke-linecap="round"/>
+    <circle cx="160" cy="95" r="12" stroke="#6B6560" stroke-width="1.5" fill="none"/>
+    <line x1="148" y1="95" x2="136" y2="95" stroke="#6B6560" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="172" y1="95" x2="184" y2="95" stroke="#6B6560" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="160" y1="83" x2="160" y2="71" stroke="#6B6560" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="250" y1="160" x2="250" y2="100" stroke="#6B6560" stroke-width="1.5" stroke-linecap="round"/>
+    <circle cx="250" cy="90" r="14" stroke="#D97706" stroke-width="1.5" fill="none"/>
+    <circle cx="250" cy="90" r="5" stroke="#6B6560" stroke-width="1" fill="none"/>
+    <path d="M320 80 Q340 60 360 80 Q340 90 320 80 Z" stroke="#6B6560" stroke-width="1" fill="none"/>
+    <path d="M320 80 Q340 100 360 80 Q340 90 320 80 Z" stroke="#6B6560" stroke-width="1" fill="none"/>
+    <ellipse cx="130" cy="140" rx="8" ry="5" stroke="#D97706" stroke-width="1.2" fill="none"/>
+    <line x1="125" y1="137" x2="122" y2="133" stroke="#6B6560" stroke-width="1"/>
+    <line x1="135" y1="137" x2="138" y2="133" stroke="#6B6560" stroke-width="1"/>
+  </svg>`,
+
+  celebration: `<svg viewBox="0 0 400 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="400" height="200" fill="white"/>
+    <rect x="140" y="120" width="120" height="55" rx="4" stroke="#6B6560" stroke-width="1.5" fill="white"/>
+    <ellipse cx="200" cy="120" rx="60" ry="12" stroke="#6B6560" stroke-width="1.5" fill="white"/>
+    <rect x="160" y="95" width="80" height="25" rx="4" stroke="#6B6560" stroke-width="1.2" fill="white"/>
+    <ellipse cx="200" cy="95" rx="40" ry="8" stroke="#6B6560" stroke-width="1.2" fill="white"/>
+    <rect x="175" y="78" width="6" height="18" rx="2" stroke="#6B6560" stroke-width="1" fill="white"/>
+    <rect x="197" y="75" width="6" height="21" rx="2" stroke="#6B6560" stroke-width="1" fill="white"/>
+    <rect x="219" y="78" width="6" height="18" rx="2" stroke="#6B6560" stroke-width="1" fill="white"/>
+    <path d="M178 78 Q180 70 182 78" stroke="#D97706" stroke-width="1.2" fill="none"/>
+    <path d="M200 75 Q202 67 204 75" stroke="#D97706" stroke-width="1.2" fill="none"/>
+    <path d="M222 78 Q224 70 226 78" stroke="#D97706" stroke-width="1.2" fill="none"/>
+    <rect x="60" y="40" width="6" height="6" transform="rotate(20 60 40)" stroke="#D97706" stroke-width="1"/>
+    <rect x="310" y="50" width="6" height="6" transform="rotate(-15 310 50)" stroke="#6B6560" stroke-width="1"/>
+    <rect x="90" y="80" width="5" height="5" transform="rotate(45 90 80)" stroke="#6B6560" stroke-width="1"/>
+    <rect x="340" y="30" width="5" height="5" transform="rotate(30 340 30)" stroke="#D97706" stroke-width="1"/>
+    <circle cx="80" cy="70" r="20" stroke="#6B6560" stroke-width="1.5" fill="none"/>
+    <line x1="80" y1="90" x2="80" y2="175" stroke="#6B6560" stroke-width="1" stroke-dasharray="3 2"/>
+    <circle cx="330" cy="60" r="18" stroke="#D97706" stroke-width="1.5" fill="none"/>
+    <line x1="330" y1="78" x2="330" y2="175" stroke="#D97706" stroke-width="1" stroke-dasharray="3 2"/>
+  </svg>`,
+
+  school: `<svg viewBox="0 0 400 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="400" height="200" fill="white"/>
+    <rect x="100" y="60" width="80" height="100" rx="4" stroke="#6B6560" stroke-width="1.5" fill="white"/>
+    <rect x="180" y="60" width="80" height="100" rx="4" stroke="#6B6560" stroke-width="1.5" fill="white"/>
+    <line x1="180" y1="60" x2="180" y2="160" stroke="#6B6560" stroke-width="2"/>
+    <line x1="115" y1="85" x2="165" y2="85" stroke="#6B6560" stroke-width="1" stroke-linecap="round"/>
+    <line x1="115" y1="98" x2="165" y2="98" stroke="#6B6560" stroke-width="1" stroke-linecap="round"/>
+    <line x1="115" y1="111" x2="165" y2="111" stroke="#6B6560" stroke-width="1" stroke-linecap="round"/>
+    <line x1="115" y1="124" x2="155" y2="124" stroke="#6B6560" stroke-width="1" stroke-linecap="round"/>
+    <line x1="195" y1="85" x2="245" y2="85" stroke="#6B6560" stroke-width="1" stroke-linecap="round"/>
+    <line x1="195" y1="98" x2="245" y2="98" stroke="#6B6560" stroke-width="1" stroke-linecap="round"/>
+    <line x1="195" y1="111" x2="245" y2="111" stroke="#6B6560" stroke-width="1" stroke-linecap="round"/>
+    <rect x="290" y="50" width="12" height="80" rx="2" transform="rotate(15 290 50)" stroke="#6B6560" stroke-width="1.2" fill="white"/>
+    <path d="M307 118 L315 135 L302 128 Z" stroke="#6B6560" stroke-width="1" fill="white"/>
+    <line x1="302" y1="128" x2="315" y2="135" stroke="#D97706" stroke-width="1"/>
+    <path d="M50 50 L54 62 L66 62 L57 70 L61 82 L50 75 L39 82 L43 70 L34 62 L46 62 Z" stroke="#D97706" stroke-width="1.2" fill="none"/>
+    <path d="M355 40 L358 50 L368 50 L361 56 L364 66 L355 60 L346 66 L349 56 L342 50 L352 50 Z" stroke="#6B6560" stroke-width="1" fill="none"/>
+  </svg>`,
+
+  waterfall: `<svg viewBox="0 0 400 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="400" height="200" fill="white"/>
+    <!-- Trees left side -->
+    <line x1="22" y1="145" x2="22" y2="90" stroke="#6B6560" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M5 112 L22 90 L39 112" stroke="#6B6560" stroke-width="1.2" fill="none" stroke-linejoin="round"/>
+    <path d="M8 130 L22 108 L36 130" stroke="#6B6560" stroke-width="1.2" fill="none" stroke-linejoin="round"/>
+    <line x1="60" y1="145" x2="60" y2="80" stroke="#6B6560" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M42 102 L60 80 L78 102" stroke="#6B6560" stroke-width="1.2" fill="none" stroke-linejoin="round"/>
+    <path d="M45 122 L60 100 L75 122" stroke="#6B6560" stroke-width="1.2" fill="none" stroke-linejoin="round"/>
+    <!-- Left cliff face -->
+    <path d="M100 0 L100 148" stroke="#6B6560" stroke-width="2" fill="none"/>
+    <!-- Right cliff face -->
+    <path d="M220 0 L220 148" stroke="#6B6560" stroke-width="2" fill="none"/>
+    <!-- Cliff top ledge -->
+    <path d="M80 18 Q100 12 160 14 Q200 12 230 18" stroke="#6B6560" stroke-width="1.5" fill="none"/>
+    <!-- Rock texture on left cliff -->
+    <path d="M102 40 Q115 35 128 42" stroke="#6B6560" stroke-width="0.8" fill="none"/>
+    <path d="M104 72 Q117 67 130 74" stroke="#6B6560" stroke-width="0.8" fill="none"/>
+    <path d="M103 108 Q116 103 129 110" stroke="#6B6560" stroke-width="0.8" fill="none"/>
+    <!-- Rock texture on right cliff -->
+    <path d="M192 48 Q205 43 218 50" stroke="#6B6560" stroke-width="0.8" fill="none"/>
+    <path d="M190 82 Q203 77 216 84" stroke="#6B6560" stroke-width="0.8" fill="none"/>
+    <path d="M193 115 Q206 110 217 117" stroke="#6B6560" stroke-width="0.8" fill="none"/>
+    <!-- Waterfall streams -->
+    <path d="M125 14 Q123 45 127 80 Q124 112 128 148" stroke="#6B6560" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    <path d="M143 14 Q141 43 145 78 Q143 110 140 148" stroke="#6B6560" stroke-width="1.5" fill="none" stroke-dasharray="6 3" stroke-linecap="round"/>
+    <path d="M160 14 Q162 45 158 80 Q160 112 163 148" stroke="#6B6560" stroke-width="1.5" fill="none" stroke-dasharray="6 3" stroke-linecap="round"/>
+    <path d="M178 14 Q176 43 180 78 Q178 110 175 148" stroke="#6B6560" stroke-width="2" fill="none" stroke-linecap="round"/>
+    <path d="M196 14 Q194 45 198 80 Q196 112 199 148" stroke="#6B6560" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+    <!-- Splash / mist at base -->
+    <path d="M88 155 Q160 140 230 155" stroke="#6B6560" stroke-width="1" fill="none"/>
+    <path d="M82 165 Q160 150 238 165" stroke="#6B6560" stroke-width="0.8" fill="none"/>
+    <!-- Mist dots -->
+    <circle cx="115" cy="158" r="2" stroke="#6B6560" stroke-width="0.8" fill="none"/>
+    <circle cx="145" cy="151" r="2" stroke="#6B6560" stroke-width="0.8" fill="none"/>
+    <circle cx="175" cy="154" r="2" stroke="#6B6560" stroke-width="0.8" fill="none"/>
+    <circle cx="205" cy="157" r="1.5" stroke="#6B6560" stroke-width="0.8" fill="none"/>
+    <circle cx="132" cy="164" r="1.5" stroke="#6B6560" stroke-width="0.8" fill="none"/>
+    <!-- Pool ripples -->
+    <path d="M70 172 Q160 162 250 172" stroke="#6B6560" stroke-width="1.2" fill="none"/>
+    <path d="M80 182 Q160 173 240 182" stroke="#6B6560" stroke-width="0.8" fill="none"/>
+    <!-- Rocks at pool base -->
+    <ellipse cx="108" cy="165" rx="14" ry="7" stroke="#6B6560" stroke-width="1" fill="white"/>
+    <ellipse cx="210" cy="163" rx="12" ry="7" stroke="#6B6560" stroke-width="1" fill="white"/>
+    <ellipse cx="160" cy="170" rx="10" ry="6" stroke="#6B6560" stroke-width="1" fill="white"/>
+    <!-- Trees right side -->
+    <line x1="300" y1="145" x2="300" y2="80" stroke="#6B6560" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M282 103 L300 80 L318 103" stroke="#6B6560" stroke-width="1.2" fill="none" stroke-linejoin="round"/>
+    <path d="M285 123 L300 100 L315 123" stroke="#6B6560" stroke-width="1.2" fill="none" stroke-linejoin="round"/>
+    <line x1="355" y1="145" x2="355" y2="90" stroke="#6B6560" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M338 112 L355 90 L372 112" stroke="#6B6560" stroke-width="1.2" fill="none" stroke-linejoin="round"/>
+    <path d="M341 130 L355 108 L369 130" stroke="#6B6560" stroke-width="1.2" fill="none" stroke-linejoin="round"/>
+  </svg>`,
+
+  snow: `<svg viewBox="0 0 400 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="400" height="200" fill="white"/>
+    <!-- Snow-covered ground -->
+    <path d="M0 158 Q100 150 200 158 Q300 166 400 158 L400 200 L0 200 Z" stroke="#6B6560" stroke-width="1.5" fill="none"/>
+    <!-- Large snowflake top-left (6 arms with tip ticks) -->
+    <line x1="45" y1="33" x2="45" y2="63" stroke="#6B6560" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="30" y1="48" x2="60" y2="48" stroke="#6B6560" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="34" y1="37" x2="56" y2="59" stroke="#6B6560" stroke-width="1" stroke-linecap="round"/>
+    <line x1="56" y1="37" x2="34" y2="59" stroke="#6B6560" stroke-width="1" stroke-linecap="round"/>
+    <line x1="45" y1="33" x2="40" y2="38" stroke="#6B6560" stroke-width="0.8" stroke-linecap="round"/>
+    <line x1="45" y1="33" x2="50" y2="38" stroke="#6B6560" stroke-width="0.8" stroke-linecap="round"/>
+    <line x1="45" y1="63" x2="40" y2="58" stroke="#6B6560" stroke-width="0.8" stroke-linecap="round"/>
+    <line x1="45" y1="63" x2="50" y2="58" stroke="#6B6560" stroke-width="0.8" stroke-linecap="round"/>
+    <line x1="30" y1="48" x2="35" y2="43" stroke="#6B6560" stroke-width="0.8" stroke-linecap="round"/>
+    <line x1="30" y1="48" x2="35" y2="53" stroke="#6B6560" stroke-width="0.8" stroke-linecap="round"/>
+    <line x1="60" y1="48" x2="55" y2="43" stroke="#6B6560" stroke-width="0.8" stroke-linecap="round"/>
+    <line x1="60" y1="48" x2="55" y2="53" stroke="#6B6560" stroke-width="0.8" stroke-linecap="round"/>
+    <!-- Medium snowflake top-centre -->
+    <line x1="200" y1="20" x2="200" y2="44" stroke="#6B6560" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="188" y1="32" x2="212" y2="32" stroke="#6B6560" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="191" y1="23" x2="209" y2="41" stroke="#6B6560" stroke-width="1" stroke-linecap="round"/>
+    <line x1="209" y1="23" x2="191" y2="41" stroke="#6B6560" stroke-width="1" stroke-linecap="round"/>
+    <!-- Medium snowflake top-right -->
+    <line x1="355" y1="28" x2="355" y2="50" stroke="#6B6560" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="344" y1="39" x2="366" y2="39" stroke="#6B6560" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="347" y1="31" x2="363" y2="47" stroke="#6B6560" stroke-width="1" stroke-linecap="round"/>
+    <line x1="363" y1="31" x2="347" y2="47" stroke="#6B6560" stroke-width="1" stroke-linecap="round"/>
+    <!-- Small snowflakes scattered -->
+    <line x1="130" y1="58" x2="130" y2="70" stroke="#6B6560" stroke-width="1" stroke-linecap="round"/>
+    <line x1="124" y1="64" x2="136" y2="64" stroke="#6B6560" stroke-width="1" stroke-linecap="round"/>
+    <line x1="126" y1="60" x2="134" y2="68" stroke="#6B6560" stroke-width="0.8" stroke-linecap="round"/>
+    <line x1="134" y1="60" x2="126" y2="68" stroke="#6B6560" stroke-width="0.8" stroke-linecap="round"/>
+    <line x1="272" y1="68" x2="272" y2="80" stroke="#6B6560" stroke-width="1" stroke-linecap="round"/>
+    <line x1="266" y1="74" x2="278" y2="74" stroke="#6B6560" stroke-width="1" stroke-linecap="round"/>
+    <line x1="268" y1="70" x2="276" y2="78" stroke="#6B6560" stroke-width="0.8" stroke-linecap="round"/>
+    <line x1="276" y1="70" x2="268" y2="78" stroke="#6B6560" stroke-width="0.8" stroke-linecap="round"/>
+    <line x1="90" y1="98" x2="90" y2="108" stroke="#6B6560" stroke-width="1" stroke-linecap="round"/>
+    <line x1="85" y1="103" x2="95" y2="103" stroke="#6B6560" stroke-width="1" stroke-linecap="round"/>
+    <line x1="87" y1="100" x2="93" y2="106" stroke="#6B6560" stroke-width="0.8" stroke-linecap="round"/>
+    <line x1="93" y1="100" x2="87" y2="106" stroke="#6B6560" stroke-width="0.8" stroke-linecap="round"/>
+    <line x1="320" y1="95" x2="320" y2="105" stroke="#6B6560" stroke-width="1" stroke-linecap="round"/>
+    <line x1="315" y1="100" x2="325" y2="100" stroke="#6B6560" stroke-width="1" stroke-linecap="round"/>
+    <line x1="317" y1="97" x2="323" y2="103" stroke="#6B6560" stroke-width="0.8" stroke-linecap="round"/>
+    <line x1="323" y1="97" x2="317" y2="103" stroke="#6B6560" stroke-width="0.8" stroke-linecap="round"/>
+    <!-- Snowman -->
+    <circle cx="110" cy="142" r="18" stroke="#6B6560" stroke-width="1.5" fill="white"/>
+    <circle cx="110" cy="112" r="13" stroke="#6B6560" stroke-width="1.5" fill="white"/>
+    <circle cx="110" cy="89" r="9" stroke="#6B6560" stroke-width="1.5" fill="white"/>
+    <!-- Face -->
+    <circle cx="107" cy="87" r="1.5" fill="#6B6560"/>
+    <circle cx="113" cy="87" r="1.5" fill="#6B6560"/>
+    <path d="M107 92 Q110 95 113 92" stroke="#6B6560" stroke-width="1" fill="none"/>
+    <!-- Carrot nose -->
+    <path d="M110 89 L117 87" stroke="#D97706" stroke-width="1.5" stroke-linecap="round"/>
+    <!-- Hat -->
+    <rect x="100" y="77" width="20" height="5" stroke="#6B6560" stroke-width="1" fill="white"/>
+    <rect x="103" y="61" width="14" height="17" rx="1" stroke="#6B6560" stroke-width="1" fill="white"/>
+    <!-- Buttons -->
+    <circle cx="110" cy="109" r="2" fill="#6B6560"/>
+    <circle cx="110" cy="117" r="2" fill="#6B6560"/>
+    <circle cx="110" cy="125" r="2" fill="#6B6560"/>
+    <!-- Arms -->
+    <line x1="97" y1="111" x2="78" y2="101" stroke="#6B6560" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="78" y1="101" x2="72" y2="95" stroke="#6B6560" stroke-width="1" stroke-linecap="round"/>
+    <line x1="78" y1="101" x2="72" y2="107" stroke="#6B6560" stroke-width="1" stroke-linecap="round"/>
+    <line x1="123" y1="111" x2="142" y2="101" stroke="#6B6560" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="142" y1="101" x2="148" y2="95" stroke="#6B6560" stroke-width="1" stroke-linecap="round"/>
+    <line x1="142" y1="101" x2="148" y2="107" stroke="#6B6560" stroke-width="1" stroke-linecap="round"/>
+    <!-- House right side -->
+    <rect x="248" y="95" width="122" height="65" rx="2" stroke="#6B6560" stroke-width="1.5" fill="white"/>
+    <!-- Roof -->
+    <path d="M240 95 L309 56 L378 95" stroke="#6B6560" stroke-width="1.5" fill="none" stroke-linejoin="round"/>
+    <!-- Snow on roof -->
+    <path d="M246 95 Q309 80 372 95" stroke="#6B6560" stroke-width="2.5" fill="none"/>
+    <!-- Chimney -->
+    <rect x="344" y="60" width="12" height="22" stroke="#6B6560" stroke-width="1.2" fill="white"/>
+    <path d="M342 60 Q350 56 358 60" stroke="#6B6560" stroke-width="2" fill="none"/>
+    <path d="M350 60 Q348 52 352 44 Q349 37 353 30" stroke="#6B6560" stroke-width="1" fill="none" stroke-dasharray="2 2"/>
+    <!-- Door -->
+    <rect x="293" y="128" width="28" height="32" rx="2" stroke="#6B6560" stroke-width="1.2" fill="none"/>
+    <!-- Windows -->
+    <rect x="256" y="107" width="26" height="22" rx="2" stroke="#6B6560" stroke-width="1" fill="none"/>
+    <line x1="269" y1="107" x2="269" y2="129" stroke="#6B6560" stroke-width="0.8"/>
+    <line x1="256" y1="118" x2="282" y2="118" stroke="#6B6560" stroke-width="0.8"/>
+    <rect x="333" y="107" width="26" height="22" rx="2" stroke="#6B6560" stroke-width="1" fill="none"/>
+    <line x1="346" y1="107" x2="346" y2="129" stroke="#6B6560" stroke-width="0.8"/>
+    <line x1="333" y1="118" x2="359" y2="118" stroke="#6B6560" stroke-width="0.8"/>
+  </svg>`,
+
+  monorail: `<svg viewBox="0 0 400 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="400" height="200" fill="white"/>
+    <!-- Faint city silhouette -->
+    <rect x="0" y="52" width="22" height="68" stroke="#6B6560" stroke-width="0.8" fill="none" opacity="0.2"/>
+    <rect x="22" y="38" width="18" height="82" stroke="#6B6560" stroke-width="0.8" fill="none" opacity="0.2"/>
+    <rect x="40" y="62" width="16" height="58" stroke="#6B6560" stroke-width="0.8" fill="none" opacity="0.2"/>
+    <rect x="348" y="58" width="22" height="62" stroke="#6B6560" stroke-width="0.8" fill="none" opacity="0.2"/>
+    <rect x="370" y="44" width="20" height="76" stroke="#6B6560" stroke-width="0.8" fill="none" opacity="0.2"/>
+    <!-- Support pillars -->
+    <rect x="82" y="130" width="14" height="62" rx="2" stroke="#6B6560" stroke-width="1.2" fill="white"/>
+    <rect x="205" y="130" width="14" height="62" rx="2" stroke="#6B6560" stroke-width="1.2" fill="white"/>
+    <rect x="320" y="130" width="14" height="62" rx="2" stroke="#6B6560" stroke-width="1.2" fill="white"/>
+    <!-- Pillar bases -->
+    <rect x="76" y="188" width="26" height="10" rx="2" stroke="#6B6560" stroke-width="1" fill="white"/>
+    <rect x="199" y="188" width="26" height="10" rx="2" stroke="#6B6560" stroke-width="1" fill="white"/>
+    <rect x="314" y="188" width="26" height="10" rx="2" stroke="#6B6560" stroke-width="1" fill="white"/>
+    <!-- Guideway beam -->
+    <rect x="0" y="120" width="400" height="10" rx="2" stroke="#6B6560" stroke-width="1.2" fill="white"/>
+    <!-- Monorail car body -->
+    <path d="M35 75 Q25 80 22 95 L22 120 L365 120 L365 82 Q356 72 342 70 L65 70 Q48 70 35 75 Z" stroke="#6B6560" stroke-width="1.5" fill="white"/>
+    <!-- Front nose (right, direction of travel) -->
+    <path d="M342 70 Q372 72 380 98 Q381 112 372 120 L365 120 L365 82" stroke="#6B6560" stroke-width="1.5" fill="white"/>
+    <!-- Rear tail (left) -->
+    <path d="M35 75 Q22 82 22 98 L22 120" stroke="#6B6560" stroke-width="1.5" fill="white"/>
+    <!-- Windows: row of rounded rectangles -->
+    <rect x="42" y="79" width="28" height="22" rx="3" stroke="#6B6560" stroke-width="1.2" fill="none"/>
+    <rect x="78" y="79" width="28" height="22" rx="3" stroke="#6B6560" stroke-width="1.2" fill="none"/>
+    <rect x="114" y="79" width="28" height="22" rx="3" stroke="#6B6560" stroke-width="1.2" fill="none"/>
+    <rect x="150" y="79" width="28" height="22" rx="3" stroke="#6B6560" stroke-width="1.2" fill="none"/>
+    <rect x="186" y="79" width="28" height="22" rx="3" stroke="#6B6560" stroke-width="1.2" fill="none"/>
+    <rect x="222" y="79" width="28" height="22" rx="3" stroke="#6B6560" stroke-width="1.2" fill="none"/>
+    <rect x="258" y="79" width="28" height="22" rx="3" stroke="#6B6560" stroke-width="1.2" fill="none"/>
+    <rect x="294" y="79" width="28" height="22" rx="3" stroke="#6B6560" stroke-width="1.2" fill="none"/>
+    <rect x="328" y="79" width="22" height="22" rx="3" stroke="#6B6560" stroke-width="1.2" fill="none"/>
+    <!-- Amber accent stripe -->
+    <line x1="22" y1="110" x2="380" y2="110" stroke="#D97706" stroke-width="2"/>
+    <!-- Headlight -->
+    <circle cx="374" cy="95" r="6" stroke="#D97706" stroke-width="1.5" fill="none"/>
+    <!-- Door seams -->
+    <line x1="128" y1="101" x2="128" y2="120" stroke="#6B6560" stroke-width="1"/>
+    <line x1="244" y1="101" x2="244" y2="120" stroke="#6B6560" stroke-width="1"/>
+  </svg>`,
+
+  longtrain: `<svg viewBox="0 0 400 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="400" height="200" fill="white"/>
+    <!-- Rolling hills background -->
+    <path d="M0 118 Q55 100 110 115 Q165 130 220 110 Q275 90 330 108 Q370 122 400 112" stroke="#6B6560" stroke-width="0.8" fill="none" opacity="0.35"/>
+    <!-- Train rails -->
+    <line x1="0" y1="176" x2="400" y2="176" stroke="#6B6560" stroke-width="2" stroke-linecap="round"/>
+    <line x1="0" y1="184" x2="400" y2="184" stroke="#6B6560" stroke-width="2" stroke-linecap="round"/>
+    <!-- Rail sleepers / ties -->
+    <line x1="10" y1="173" x2="10" y2="187" stroke="#6B6560" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="35" y1="173" x2="35" y2="187" stroke="#6B6560" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="60" y1="173" x2="60" y2="187" stroke="#6B6560" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="85" y1="173" x2="85" y2="187" stroke="#6B6560" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="110" y1="173" x2="110" y2="187" stroke="#6B6560" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="135" y1="173" x2="135" y2="187" stroke="#6B6560" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="160" y1="173" x2="160" y2="187" stroke="#6B6560" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="185" y1="173" x2="185" y2="187" stroke="#6B6560" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="210" y1="173" x2="210" y2="187" stroke="#6B6560" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="235" y1="173" x2="235" y2="187" stroke="#6B6560" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="260" y1="173" x2="260" y2="187" stroke="#6B6560" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="285" y1="173" x2="285" y2="187" stroke="#6B6560" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="310" y1="173" x2="310" y2="187" stroke="#6B6560" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="335" y1="173" x2="335" y2="187" stroke="#6B6560" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="360" y1="173" x2="360" y2="187" stroke="#6B6560" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="385" y1="173" x2="385" y2="187" stroke="#6B6560" stroke-width="1.5" stroke-linecap="round"/>
+    <!-- Locomotive (rightmost) -->
+    <!-- Boiler body -->
+    <rect x="282" y="132" width="88" height="40" rx="5" stroke="#6B6560" stroke-width="1.5" fill="white"/>
+    <!-- Cab on top -->
+    <rect x="290" y="110" width="50" height="24" rx="3" stroke="#6B6560" stroke-width="1.5" fill="white"/>
+    <!-- Cab windows -->
+    <rect x="298" y="115" width="14" height="11" rx="2" stroke="#6B6560" stroke-width="1" fill="none"/>
+    <rect x="318" y="115" width="14" height="11" rx="2" stroke="#6B6560" stroke-width="1" fill="none"/>
+    <!-- Smokestack funnel -->
+    <rect x="350" y="120" width="11" height="14" rx="2" stroke="#6B6560" stroke-width="1.2" fill="white"/>
+    <path d="M348 120 L346 116 Q355 112 366 116 L364 120" stroke="#6B6560" stroke-width="1" fill="none"/>
+    <!-- Smoke puffing out -->
+    <path d="M356 116 Q354 105 358 96 Q355 88 359 80" stroke="#6B6560" stroke-width="1.2" fill="none" stroke-dasharray="3 2"/>
+    <path d="M360 114 Q362 103 358 94 Q361 86 357 78" stroke="#6B6560" stroke-width="1.2" fill="none" stroke-dasharray="3 2"/>
+    <!-- Smoke clouds -->
+    <circle cx="358" cy="72" r="8" stroke="#6B6560" stroke-width="1" fill="none"/>
+    <circle cx="368" cy="66" r="7" stroke="#6B6560" stroke-width="1" fill="none"/>
+    <circle cx="350" cy="67" r="6" stroke="#6B6560" stroke-width="1" fill="none"/>
+    <!-- Headlight -->
+    <ellipse cx="370" cy="150" rx="6" ry="5" stroke="#D97706" stroke-width="1.5" fill="none"/>
+    <!-- Cowcatcher -->
+    <path d="M370 153 L380 163 L388 176 L370 176" stroke="#6B6560" stroke-width="1.2" fill="none"/>
+    <!-- Driving wheels (large) -->
+    <circle cx="308" cy="176" r="14" stroke="#6B6560" stroke-width="1.5" fill="white"/>
+    <circle cx="308" cy="176" r="5" stroke="#6B6560" stroke-width="1" fill="white"/>
+    <circle cx="344" cy="176" r="14" stroke="#6B6560" stroke-width="1.5" fill="white"/>
+    <circle cx="344" cy="176" r="5" stroke="#6B6560" stroke-width="1" fill="white"/>
+    <!-- Connecting rod -->
+    <line x1="308" y1="171" x2="344" y2="171" stroke="#6B6560" stroke-width="2" stroke-linecap="round"/>
+    <!-- Small pilot wheel -->
+    <circle cx="376" cy="176" r="8" stroke="#6B6560" stroke-width="1.2" fill="white"/>
+    <!-- Passenger car 1 -->
+    <rect x="192" y="127" width="88" height="45" rx="4" stroke="#6B6560" stroke-width="1.5" fill="white"/>
+    <rect x="200" y="135" width="16" height="14" rx="2" stroke="#6B6560" stroke-width="1" fill="none"/>
+    <rect x="222" y="135" width="16" height="14" rx="2" stroke="#6B6560" stroke-width="1" fill="none"/>
+    <rect x="244" y="135" width="16" height="14" rx="2" stroke="#6B6560" stroke-width="1" fill="none"/>
+    <rect x="266" y="135" width="16" height="14" rx="2" stroke="#6B6560" stroke-width="1" fill="none"/>
+    <circle cx="212" cy="175" r="8" stroke="#6B6560" stroke-width="1.2" fill="white"/>
+    <circle cx="260" cy="175" r="8" stroke="#6B6560" stroke-width="1.2" fill="white"/>
+    <line x1="280" y1="150" x2="282" y2="150" stroke="#6B6560" stroke-width="1.5" stroke-linecap="round"/>
+    <!-- Passenger car 2 -->
+    <rect x="98" y="127" width="88" height="45" rx="4" stroke="#6B6560" stroke-width="1.5" fill="white"/>
+    <rect x="106" y="135" width="16" height="14" rx="2" stroke="#6B6560" stroke-width="1" fill="none"/>
+    <rect x="128" y="135" width="16" height="14" rx="2" stroke="#6B6560" stroke-width="1" fill="none"/>
+    <rect x="150" y="135" width="16" height="14" rx="2" stroke="#6B6560" stroke-width="1" fill="none"/>
+    <rect x="172" y="135" width="16" height="14" rx="2" stroke="#6B6560" stroke-width="1" fill="none"/>
+    <circle cx="118" cy="175" r="8" stroke="#6B6560" stroke-width="1.2" fill="white"/>
+    <circle cx="166" cy="175" r="8" stroke="#6B6560" stroke-width="1.2" fill="white"/>
+    <line x1="186" y1="150" x2="192" y2="150" stroke="#6B6560" stroke-width="1.5" stroke-linecap="round"/>
+    <!-- Passenger car 3 (leftmost) -->
+    <rect x="5" y="127" width="88" height="45" rx="4" stroke="#6B6560" stroke-width="1.5" fill="white"/>
+    <rect x="13" y="135" width="16" height="14" rx="2" stroke="#6B6560" stroke-width="1" fill="none"/>
+    <rect x="35" y="135" width="16" height="14" rx="2" stroke="#6B6560" stroke-width="1" fill="none"/>
+    <rect x="57" y="135" width="16" height="14" rx="2" stroke="#6B6560" stroke-width="1" fill="none"/>
+    <rect x="79" y="135" width="16" height="14" rx="2" stroke="#6B6560" stroke-width="1" fill="none"/>
+    <circle cx="25" cy="175" r="8" stroke="#6B6560" stroke-width="1.2" fill="white"/>
+    <circle cx="73" cy="175" r="8" stroke="#6B6560" stroke-width="1.2" fill="white"/>
+    <line x1="93" y1="150" x2="98" y2="150" stroke="#6B6560" stroke-width="1.5" stroke-linecap="round"/>
+  </svg>`,
+
+  laketrail: `<svg viewBox="0 0 400 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="400" height="200" fill="white"/>
+    <!-- Far shore tree line (across the lake) -->
+    <path d="M130 38 Q265 28 400 34" stroke="#6B6560" stroke-width="0.8" fill="none" opacity="0.4"/>
+    <line x1="185" y1="38" x2="185" y2="12" stroke="#6B6560" stroke-width="1.2" stroke-linecap="round" opacity="0.4"/>
+    <path d="M170 24 L185 10 L200 24" stroke="#6B6560" stroke-width="1" fill="none" stroke-linejoin="round" opacity="0.4"/>
+    <path d="M173 34 L185 22 L197 34" stroke="#6B6560" stroke-width="1" fill="none" stroke-linejoin="round" opacity="0.4"/>
+    <line x1="270" y1="32" x2="270" y2="6" stroke="#6B6560" stroke-width="1.2" stroke-linecap="round" opacity="0.4"/>
+    <path d="M255 20 L270 6 L285 20" stroke="#6B6560" stroke-width="1" fill="none" stroke-linejoin="round" opacity="0.4"/>
+    <path d="M258 30 L270 18 L282 30" stroke="#6B6560" stroke-width="1" fill="none" stroke-linejoin="round" opacity="0.4"/>
+    <line x1="348" y1="32" x2="348" y2="10" stroke="#6B6560" stroke-width="1.2" stroke-linecap="round" opacity="0.4"/>
+    <path d="M334 22 L348 8 L362 22" stroke="#6B6560" stroke-width="1" fill="none" stroke-linejoin="round" opacity="0.4"/>
+    <!-- Lake water ripples -->
+    <path d="M132 58 Q265 50 398 58" stroke="#6B6560" stroke-width="0.8" fill="none"/>
+    <path d="M130 80 Q265 72 398 80" stroke="#6B6560" stroke-width="0.8" fill="none"/>
+    <path d="M132 103 Q268 95 398 103" stroke="#6B6560" stroke-width="0.8" fill="none"/>
+    <path d="M133 126 Q268 118 398 126" stroke="#6B6560" stroke-width="0.7" fill="none"/>
+    <!-- Duck on lake -->
+    <ellipse cx="315" cy="108" rx="13" ry="7" stroke="#6B6560" stroke-width="1.2" fill="white"/>
+    <circle cx="327" cy="103" r="5" stroke="#6B6560" stroke-width="1.2" fill="white"/>
+    <path d="M331 103 L337 101 L335 105 Z" stroke="#D97706" stroke-width="1" fill="none"/>
+    <!-- Shoreline (edge of lake, near side) -->
+    <path d="M0 142 Q65 136 130 142" stroke="#6B6560" stroke-width="1.5" fill="none"/>
+    <!-- Grass tufts on near bank -->
+    <path d="M18 140 Q22 133 26 140" stroke="#6B6560" stroke-width="0.8" fill="none"/>
+    <path d="M52 138 Q56 131 60 138" stroke="#6B6560" stroke-width="0.8" fill="none"/>
+    <path d="M88 139 Q92 132 96 139" stroke="#6B6560" stroke-width="0.8" fill="none"/>
+    <!-- Trees along near bank (left of trail) -->
+    <line x1="22" y1="142" x2="22" y2="88" stroke="#6B6560" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M5 112 L22 88 L39 112" stroke="#6B6560" stroke-width="1.2" fill="none" stroke-linejoin="round"/>
+    <path d="M8 128 L22 106 L36 128" stroke="#6B6560" stroke-width="1.2" fill="none" stroke-linejoin="round"/>
+    <line x1="72" y1="140" x2="72" y2="80" stroke="#6B6560" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M55 103 L72 80 L89 103" stroke="#6B6560" stroke-width="1.2" fill="none" stroke-linejoin="round"/>
+    <path d="M58 120 L72 98 L86 120" stroke="#6B6560" stroke-width="1.2" fill="none" stroke-linejoin="round"/>
+    <!-- Paved trail (runs full width) -->
+    <path d="M0 155 Q200 148 400 155" stroke="#6B6560" stroke-width="1.2" fill="none"/>
+    <path d="M0 170 Q200 163 400 170" stroke="#6B6560" stroke-width="1.2" fill="none"/>
+    <!-- Trail centre dashes -->
+    <path d="M0 162 Q200 156 400 162" stroke="#6B6560" stroke-width="0.8" stroke-dasharray="10 6" fill="none"/>
+    <!-- Cyclist (prominent, leaning forward on trail) -->
+    <!-- Rear wheel -->
+    <circle cx="205" cy="162" r="16" stroke="#6B6560" stroke-width="1.5" fill="white"/>
+    <circle cx="205" cy="162" r="4" stroke="#6B6560" stroke-width="1" fill="white"/>
+    <!-- Front wheel -->
+    <circle cx="245" cy="162" r="16" stroke="#6B6560" stroke-width="1.5" fill="white"/>
+    <circle cx="245" cy="162" r="4" stroke="#6B6560" stroke-width="1" fill="white"/>
+    <!-- Frame: rear axle → seat tube → head tube → front axle -->
+    <line x1="205" y1="162" x2="225" y2="140" stroke="#6B6560" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="225" y1="140" x2="245" y2="162" stroke="#6B6560" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="222" y1="142" x2="205" y2="162" stroke="#6B6560" stroke-width="1.2" stroke-linecap="round"/>
+    <!-- Seat post + saddle -->
+    <line x1="222" y1="142" x2="220" y2="130" stroke="#6B6560" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="214" y1="130" x2="226" y2="130" stroke="#6B6560" stroke-width="1.5" stroke-linecap="round"/>
+    <!-- Fork + handlebar -->
+    <line x1="237" y1="143" x2="240" y2="132" stroke="#6B6560" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="236" y1="132" x2="250" y2="130" stroke="#6B6560" stroke-width="1.5" stroke-linecap="round"/>
+    <!-- Helmet + head -->
+    <circle cx="232" cy="116" r="9" stroke="#6B6560" stroke-width="1.2" fill="none"/>
+    <!-- Torso (leaning forward) -->
+    <line x1="232" y1="125" x2="240" y2="140" stroke="#6B6560" stroke-width="1.5" stroke-linecap="round"/>
+    <!-- Arm to handlebar -->
+    <line x1="235" y1="130" x2="248" y2="130" stroke="#6B6560" stroke-width="1.2" stroke-linecap="round"/>
+    <!-- Legs on pedals -->
+    <line x1="240" y1="142" x2="233" y2="154" stroke="#6B6560" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="240" y1="142" x2="250" y2="150" stroke="#6B6560" stroke-width="1.2" stroke-linecap="round"/>
+  </svg>`,
+
+  phone: `<svg viewBox="0 0 400 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="400" height="200" fill="white"/>
+    <!-- Person sitting, body -->
+    <!-- Chair / seat suggestion -->
+    <line x1="110" y1="170" x2="175" y2="170" stroke="#6B6560" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="110" y1="155" x2="110" y2="185" stroke="#6B6560" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="175" y1="155" x2="175" y2="185" stroke="#6B6560" stroke-width="1.2" stroke-linecap="round"/>
+    <!-- Torso -->
+    <path d="M130 130 Q142 125 155 130 L160 165 Q142 170 125 165 Z" stroke="#6B6560" stroke-width="1.5" fill="white"/>
+    <!-- Head -->
+    <circle cx="142" cy="113" r="16" stroke="#6B6560" stroke-width="1.5" fill="white"/>
+    <!-- Hair suggestion -->
+    <path d="M127 108 Q132 98 142 97 Q152 98 157 108" stroke="#6B6560" stroke-width="1.2" fill="none"/>
+    <!-- Eyes (looking down at phone) -->
+    <path d="M136 113 Q138 116 140 113" stroke="#6B6560" stroke-width="1" fill="none"/>
+    <path d="M144 113 Q146 116 148 113" stroke="#6B6560" stroke-width="1" fill="none"/>
+    <!-- Smile -->
+    <path d="M137 120 Q142 124 147 120" stroke="#6B6560" stroke-width="1" fill="none"/>
+    <!-- Left arm reaching forward holding phone -->
+    <line x1="130" y1="140" x2="105" y2="155" stroke="#6B6560" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="105" y1="155" x2="118" y2="160" stroke="#6B6560" stroke-width="1.5" stroke-linecap="round"/>
+    <!-- Right arm holding phone from below -->
+    <line x1="155" y1="140" x2="178" y2="152" stroke="#6B6560" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="178" y1="152" x2="165" y2="158" stroke="#6B6560" stroke-width="1.5" stroke-linecap="round"/>
+    <!-- Legs -->
+    <line x1="135" y1="165" x2="128" y2="185" stroke="#6B6560" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="128" y1="185" x2="112" y2="185" stroke="#6B6560" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="150" y1="165" x2="158" y2="185" stroke="#6B6560" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="158" y1="185" x2="174" y2="185" stroke="#6B6560" stroke-width="1.2" stroke-linecap="round"/>
+    <!-- Phone (held in front, tilted slightly) -->
+    <rect x="195" y="120" width="50" height="82" rx="6" stroke="#6B6560" stroke-width="1.8" fill="white"/>
+    <!-- Phone screen -->
+    <rect x="201" y="130" width="38" height="60" rx="2" stroke="#6B6560" stroke-width="1" fill="none"/>
+    <!-- Screen content: text lines -->
+    <line x1="206" y1="140" x2="234" y2="140" stroke="#6B6560" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="206" y1="149" x2="234" y2="149" stroke="#6B6560" stroke-width="1" stroke-linecap="round"/>
+    <line x1="206" y1="157" x2="228" y2="157" stroke="#6B6560" stroke-width="1" stroke-linecap="round"/>
+    <line x1="206" y1="165" x2="234" y2="165" stroke="#6B6560" stroke-width="1" stroke-linecap="round"/>
+    <line x1="206" y1="173" x2="222" y2="173" stroke="#6B6560" stroke-width="1" stroke-linecap="round"/>
+    <!-- Screen title bar (suggests an app/website) -->
+    <rect x="201" y="130" width="38" height="8" rx="1" stroke="#D97706" stroke-width="0.8" fill="none"/>
+    <!-- Home indicator -->
+    <line x1="215" y1="197" x2="225" y2="197" stroke="#6B6560" stroke-width="1.5" stroke-linecap="round"/>
+    <!-- Phone notch / front camera -->
+    <circle cx="220" cy="125" r="2" stroke="#6B6560" stroke-width="1" fill="none"/>
+    <!-- Speech bubbles / notification floating up -->
+    <path d="M258 105 Q280 98 295 105 Q295 118 280 118 Q278 122 275 125 Q274 118 258 118 Z" stroke="#6B6560" stroke-width="1.2" fill="white"/>
+    <line x1="265" y1="108" x2="288" y2="108" stroke="#6B6560" stroke-width="1" stroke-linecap="round"/>
+    <line x1="265" y1="114" x2="282" y2="114" stroke="#6B6560" stroke-width="1" stroke-linecap="round"/>
+    <!-- Second smaller bubble -->
+    <path d="M268 80 Q286 74 298 80 Q298 91 286 91 Q284 95 282 97 Q281 91 268 91 Z" stroke="#6B6560" stroke-width="1" fill="white"/>
+    <line x1="274" y1="83" x2="292" y2="83" stroke="#6B6560" stroke-width="0.8" stroke-linecap="round"/>
+    <line x1="274" y1="88" x2="286" y2="88" stroke="#6B6560" stroke-width="0.8" stroke-linecap="round"/>
+  </svg>`,
+
+  book: `<svg viewBox="0 0 400 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect width="400" height="200" fill="white"/>
+    <path d="M80 40 Q80 30 90 30 L190 30 Q200 30 200 40 L200 160 Q200 170 190 170 L90 170 Q80 170 80 160 Z" stroke="#6B6560" stroke-width="1.5" fill="white"/>
+    <path d="M320 40 Q320 30 310 30 L210 30 Q200 30 200 40 L200 160 Q200 170 210 170 L310 170 Q320 170 320 160 Z" stroke="#6B6560" stroke-width="1.5" fill="white"/>
+    <line x1="200" y1="30" x2="200" y2="170" stroke="#6B6560" stroke-width="2.5"/>
+    <line x1="100" y1="60" x2="185" y2="60" stroke="#6B6560" stroke-width="1" stroke-linecap="round"/>
+    <line x1="100" y1="75" x2="185" y2="75" stroke="#6B6560" stroke-width="1" stroke-linecap="round"/>
+    <line x1="100" y1="90" x2="185" y2="90" stroke="#6B6560" stroke-width="1" stroke-linecap="round"/>
+    <line x1="100" y1="105" x2="170" y2="105" stroke="#6B6560" stroke-width="1" stroke-linecap="round"/>
+    <line x1="100" y1="120" x2="185" y2="120" stroke="#6B6560" stroke-width="1" stroke-linecap="round"/>
+    <line x1="100" y1="135" x2="160" y2="135" stroke="#6B6560" stroke-width="1" stroke-linecap="round"/>
+    <line x1="215" y1="60" x2="300" y2="60" stroke="#6B6560" stroke-width="1" stroke-linecap="round"/>
+    <line x1="215" y1="75" x2="300" y2="75" stroke="#6B6560" stroke-width="1" stroke-linecap="round"/>
+    <line x1="215" y1="90" x2="285" y2="90" stroke="#6B6560" stroke-width="1" stroke-linecap="round"/>
+    <line x1="215" y1="105" x2="300" y2="105" stroke="#6B6560" stroke-width="1" stroke-linecap="round"/>
+    <line x1="215" y1="120" x2="300" y2="120" stroke="#6B6560" stroke-width="1" stroke-linecap="round"/>
+    <line x1="215" y1="135" x2="275" y2="135" stroke="#6B6560" stroke-width="1" stroke-linecap="round"/>
+    <path d="M300 155 Q315 160 310 170" stroke="#6B6560" stroke-width="1" fill="none"/>
+  </svg>`,
+};
+---
+
+<div class:list={['pencil-illustration', className]} aria-hidden="true">
+  <Fragment set:html={svgMap[scene] || svgMap.book} />
+</div>
+
+<style>
+  .pencil-illustration {
+    width: 100%;
+    height: 100%;
+  }
+
+  .pencil-illustration :global(svg) {
+    width: 100%;
+    height: 100%;
+  }
+</style>

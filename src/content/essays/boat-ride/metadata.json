@@ -1,0 +1,58 @@
+{
+  "slug": "boat-ride",
+  "englishTitle": "Boat Ride",
+  "displayTitles": {
+    "tamil": "படகுச் சவாரி",
+    "english": "Boat Ride",
+    "hindi": "नाव की सवारी - Boat ride",
+    "telugu": "నౌక లో ప్రయాణం - Boat Ride",
+    "marathi": "बोट राइड",
+    "kannada": "ದೋಣಿ ವಿಹಾರ (Boat ride)"
+  },
+  "availableLanguages": [
+    "tamil",
+    "english",
+    "hindi",
+    "telugu",
+    "marathi",
+    "kannada"
+  ],
+  "originalAuthor": "Guruprasad Vijayarao",
+  "translators": {
+    "tamil": {
+      "name": "Guruprasad Vijayarao",
+      "blog": ""
+    },
+    "english": {
+      "name": "Jayanthi Gowrishankaran",
+      "blog": "https://seattledesikids.blogspot.com"
+    },
+    "hindi": {
+      "name": "Rahul Upadhyaya",
+      "blog": "https://nanhihindi.blogspot.com"
+    },
+    "telugu": {
+      "name": "Pavan Kumar Yerravelly",
+      "blog": "https://seattletelugukids.blogspot.com"
+    },
+    "marathi": {
+      "name": "Mahesh Deshpande",
+      "blog": "https://seattlemarathi.blogspot.com"
+    },
+    "kannada": {
+      "name": "Naraya",
+      "blog": "https://muddadakannada.blogspot.com"
+    }
+  },
+  "illustrations": [],
+  "tags": [],
+  "sourceUrls": {
+    "english": "https://seattledesikids.blogspot.com/2022/11/boating.html",
+    "hindi": "https://nanhihindi.blogspot.com/2023/12/blog-post_16.html",
+    "telugu": "https://seattletelugukids.blogspot.com/2024/10/boat-ride.html",
+    "marathi": "https://seattlemarathi.blogspot.com/2024/11/blog-post.html",
+    "kannada": "https://muddadakannada.blogspot.com/2023/06/boat-ride.html"
+  },
+  "publishedDate": "2026-02-28",
+  "lastUpdated": "2026-02-28"
+}

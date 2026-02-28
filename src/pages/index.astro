@@ -1,0 +1,182 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import EssayCard from '../components/EssayCard.astro';
+import { type LangCode } from '../utils/languages';
+import { FREE_ESSAY_SLUGS } from '../lib/freeEssays';
+import fs from 'node:fs';
+import path from 'node:path';
+
+// Load all essays from the content/essays directory
+const essaysDir = path.join(process.cwd(), 'src', 'content', 'essays');
+
+interface EssayMeta {
+  slug: string;
+  englishTitle: string;
+  availableLanguages: LangCode[];
+  illustration?: string;
+}
+
+let essays: EssayMeta[] = [];
+
+if (fs.existsSync(essaysDir)) {
+  const slugs = fs.readdirSync(essaysDir).filter(name => {
+    return fs.statSync(path.join(essaysDir, name)).isDirectory();
+  });
+
+  for (const slug of slugs) {
+    const metaPath = path.join(essaysDir, slug, 'metadata.json');
+    if (fs.existsSync(metaPath)) {
+      const meta = JSON.parse(fs.readFileSync(metaPath, 'utf-8'));
+      essays.push({
+        slug: meta.slug,
+        englishTitle: meta.englishTitle,
+        availableLanguages: meta.availableLanguages || [],
+        illustration: meta.illustrations?.[0],
+      });
+    }
+  }
+}
+
+// Sort by number of available languages (most first), then alphabetically
+essays.sort((a, b) => {
+  const diff = b.availableLanguages.length - a.availableLanguages.length;
+  if (diff !== 0) return diff;
+  return a.englishTitle.localeCompare(b.englishTitle);
+});
+---
+
+<BaseLayout
+  title="Seattle Desi Kids"
+  description="Children's essays in 5 languages — English, Hindi, Telugu, Marathi and Kannada. Original essays by Guruprasad Vijayarao."
+>
+  <div class="container">
+    <section class="hero">
+      <p class="hero-subtitle">
+        A collection of children's essays about life in the Pacific Northwest.
+      </p>
+      <div class="hero-langs">
+        <span class="hero-lang" style="--lang-color: var(--color-lang-ta)">
+          <span class="hero-lang-native">தமிழ்</span>
+          <span class="hero-lang-english">Tamil</span>
+        </span>
+        <span class="hero-lang" style="--lang-color: var(--color-lang-en)">
+          <span class="hero-lang-native">English</span>
+          <span class="hero-lang-english">English</span>
+        </span>
+        <span class="hero-lang" style="--lang-color: var(--color-lang-hi)">
+          <span class="hero-lang-native">हिन्दी</span>
+          <span class="hero-lang-english">Hindi</span>
+        </span>
+        <span class="hero-lang" style="--lang-color: var(--color-lang-te)">
+          <span class="hero-lang-native">తెలుగు</span>
+          <span class="hero-lang-english">Telugu</span>
+        </span>
+        <span class="hero-lang" style="--lang-color: var(--color-lang-mr)">
+          <span class="hero-lang-native">मराठी</span>
+          <span class="hero-lang-english">Marathi</span>
+        </span>
+        <span class="hero-lang" style="--lang-color: var(--color-lang-kn)">
+          <span class="hero-lang-native">ಕನ್ನಡ</span>
+          <span class="hero-lang-english">Kannada</span>
+        </span>
+      </div>
+    </section>
+
+    {essays.length > 0 ? (
+      <section class="essays-section">
+        <h2 class="section-heading">All Essays</h2>
+        <div class="essay-grid">
+          {essays.map(essay => (
+            <EssayCard
+              slug={essay.slug}
+              title={essay.englishTitle}
+              availableLanguages={essay.availableLanguages}
+              illustration={essay.illustration}
+              isFree={FREE_ESSAY_SLUGS.includes(essay.slug)}
+            />
+          ))}
+        </div>
+      </section>
+    ) : (
+      <section class="empty-state">
+        <p>Essays are being prepared. Check back soon!</p>
+        <p class="empty-hint">Run <code>python scripts/scrape_blogs.py</code> to load content.</p>
+      </section>
+    )}
+  </div>
+</BaseLayout>
+
+<style>
+  .hero {
+    text-align: center;
+    padding-top: var(--space-md);
+    padding-bottom: var(--space-md);
+    max-width: 680px;
+    margin-inline: auto;
+  }
+
+  .hero-subtitle {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+    margin-bottom: var(--space-md);
+  }
+
+  .hero-langs {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: var(--space-sm);
+    flex-wrap: wrap;
+  }
+
+  .hero-lang {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.2rem;
+  }
+
+  .hero-lang-native {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: var(--text-base);
+    color: var(--lang-color);
+  }
+
+  .hero-lang-english {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 400;
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+  }
+
+  .essays-section {
+    padding-bottom: var(--space-xl);
+  }
+
+  .essay-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--space-md);
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: var(--space-xl);
+    color: var(--color-text-secondary);
+  }
+
+  .empty-hint {
+    margin-top: var(--space-sm);
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+  }
+
+  .empty-hint code {
+    background: var(--color-surface-2);
+    padding: 0.125rem 0.375rem;
+    border-radius: 4px;
+    font-size: 0.875em;
+  }
+</style>

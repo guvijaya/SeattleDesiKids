@@ -1,0 +1,58 @@
+{
+  "slug": "halloween",
+  "englishTitle": "Halloween",
+  "displayTitles": {
+    "tamil": "ஹாலோவின்",
+    "english": "Halloween",
+    "hindi": "हैलोवीन - halloween",
+    "telugu": "హాలోవీన్ - Halloween",
+    "marathi": "हॅलोविन",
+    "kannada": "ಹ್ಯಾಲೋವೀನ್ (Halloween)"
+  },
+  "availableLanguages": [
+    "tamil",
+    "english",
+    "hindi",
+    "telugu",
+    "marathi",
+    "kannada"
+  ],
+  "originalAuthor": "Guruprasad Vijayarao",
+  "translators": {
+    "tamil": {
+      "name": "Guruprasad Vijayarao",
+      "blog": ""
+    },
+    "english": {
+      "name": "Jayanthi Gowrishankaran",
+      "blog": "https://seattledesikids.blogspot.com"
+    },
+    "hindi": {
+      "name": "Rahul Upadhyaya",
+      "blog": "https://nanhihindi.blogspot.com"
+    },
+    "telugu": {
+      "name": "Pavan Kumar Yerravelly",
+      "blog": "https://seattletelugukids.blogspot.com"
+    },
+    "marathi": {
+      "name": "Mahesh Deshpande",
+      "blog": "https://seattlemarathi.blogspot.com"
+    },
+    "kannada": {
+      "name": "Naraya",
+      "blog": "https://muddadakannada.blogspot.com"
+    }
+  },
+  "illustrations": [],
+  "tags": [],
+  "sourceUrls": {
+    "english": "https://seattledesikids.blogspot.com/2022/11/halloween.html",
+    "hindi": "https://nanhihindi.blogspot.com/2023/12/blog-post_54.html",
+    "telugu": "https://seattletelugukids.blogspot.com/2024/10/halloween.html",
+    "marathi": "https://seattlemarathi.blogspot.com/2025/03/blog-post_27.html",
+    "kannada": "https://muddadakannada.blogspot.com/2023/06/blog-post_37.html"
+  },
+  "publishedDate": "2026-02-28",
+  "lastUpdated": "2026-02-28"
+}

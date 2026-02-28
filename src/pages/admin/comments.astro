@@ -1,0 +1,266 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Admin — Comments"
+  description="Approve or delete reader comments."
+>
+  <div class="container admin-page">
+    <h1 class="admin-heading">Comment Moderation</h1>
+    <p class="admin-sub" id="admin-status">Checking permissions…</p>
+
+    <div id="admin-content" style="display:none">
+      <div id="admin-loading" class="admin-loading">Loading pending comments…</div>
+      <div id="admin-empty" class="admin-empty" style="display:none">
+        No pending comments. All caught up! 🎉
+      </div>
+      <table class="admin-table" id="admin-table" style="display:none">
+        <thead>
+          <tr>
+            <th>Essay</th>
+            <th>Reader</th>
+            <th>Comment</th>
+            <th>Date</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="admin-tbody"></tbody>
+      </table>
+    </div>
+
+    <div id="admin-denied" class="admin-denied" style="display:none">
+      <p>You are not authorised to view this page.</p>
+      <a href="/" class="btn-link">← Back to essays</a>
+    </div>
+  </div>
+</BaseLayout>
+
+<script>
+  import { supabase } from '@/lib/supabase.ts';
+
+  const ADMIN_USER_ID = import.meta.env.PUBLIC_ADMIN_USER_ID as string;
+
+  const statusEl = document.getElementById('admin-status')!;
+  const contentEl = document.getElementById('admin-content')!;
+  const deniedEl = document.getElementById('admin-denied')!;
+  const loadingEl = document.getElementById('admin-loading')!;
+  const emptyEl = document.getElementById('admin-empty')!;
+  const tableEl = document.getElementById('admin-table') as HTMLTableElement;
+  const tbody = document.getElementById('admin-tbody')!;
+
+  async function loadComments() {
+    const { data, error } = await supabase
+      .from('essay_comments')
+      .select('id, slug, display_name, body, created_at')
+      .eq('approved', false)
+      .order('created_at', { ascending: true });
+
+    loadingEl.style.display = 'none';
+
+    if (error) {
+      emptyEl.textContent = 'Error loading comments: ' + error.message;
+      emptyEl.style.display = '';
+      return;
+    }
+
+    if (!data || data.length === 0) {
+      emptyEl.style.display = '';
+      return;
+    }
+
+    tableEl.style.display = '';
+    tbody.innerHTML = '';
+
+    for (const comment of data) {
+      const date = new Date(comment.created_at).toLocaleDateString('en-US', {
+        year: 'numeric', month: 'short', day: 'numeric',
+      });
+      const tr = document.createElement('tr');
+      tr.dataset.id = comment.id;
+      tr.innerHTML = `
+        <td class="col-essay">${escHtml(comment.slug)}</td>
+        <td class="col-name">${escHtml(comment.display_name || 'Anonymous')}</td>
+        <td class="col-body">${escHtml(comment.body)}</td>
+        <td class="col-date">${date}</td>
+        <td class="col-actions">
+          <button class="btn-approve" data-id="${comment.id}">Approve</button>
+          <button class="btn-delete" data-id="${comment.id}">Delete</button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    }
+
+    // Wire up approve buttons
+    tbody.querySelectorAll<HTMLButtonElement>('.btn-approve').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const id = btn.dataset.id!;
+        btn.disabled = true;
+        btn.textContent = '…';
+        const { error } = await supabase
+          .from('essay_comments')
+          .update({ approved: true })
+          .eq('id', id);
+        if (error) { alert('Error: ' + error.message); btn.disabled = false; return; }
+        document.querySelector(`tr[data-id="${id}"]`)?.remove();
+        if (!tbody.children.length) { tableEl.style.display = 'none'; emptyEl.style.display = ''; }
+      });
+    });
+
+    // Wire up delete buttons
+    tbody.querySelectorAll<HTMLButtonElement>('.btn-delete').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        if (!confirm('Delete this comment permanently?')) return;
+        const id = btn.dataset.id!;
+        btn.disabled = true;
+        const { error } = await supabase
+          .from('essay_comments')
+          .delete()
+          .eq('id', id);
+        if (error) { alert('Error: ' + error.message); btn.disabled = false; return; }
+        document.querySelector(`tr[data-id="${id}"]`)?.remove();
+        if (!tbody.children.length) { tableEl.style.display = 'none'; emptyEl.style.display = ''; }
+      });
+    });
+  }
+
+  function escHtml(s: string): string {
+    return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  // Auth check
+  const { data: { session } } = await supabase.auth.getSession();
+
+  if (!session) {
+    statusEl.textContent = 'Please sign in with your admin Google account to continue.';
+    deniedEl.style.display = '';
+  } else if (session.user.id !== ADMIN_USER_ID) {
+    statusEl.style.display = 'none';
+    deniedEl.style.display = '';
+  } else {
+    statusEl.style.display = 'none';
+    contentEl.style.display = '';
+    await loadComments();
+  }
+
+  supabase.auth.onAuthStateChange((_event, session) => {
+    if (session && session.user.id === ADMIN_USER_ID) {
+      statusEl.style.display = 'none';
+      deniedEl.style.display = 'none';
+      contentEl.style.display = '';
+    }
+  });
+</script>
+
+<style>
+  .admin-page {
+    max-width: 900px;
+    padding-top: var(--space-lg);
+    padding-bottom: var(--space-xl);
+  }
+
+  .admin-heading {
+    font-family: 'Nunito', sans-serif;
+    font-size: var(--text-2xl);
+    font-weight: 800;
+    color: var(--color-text-primary);
+    margin-bottom: 0.5rem;
+  }
+
+  .admin-sub {
+    font-family: 'Nunito', sans-serif;
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    margin-bottom: var(--space-lg);
+  }
+
+  .admin-loading,
+  .admin-empty {
+    font-family: 'Nunito', sans-serif;
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    padding: var(--space-lg) 0;
+  }
+
+  .admin-denied {
+    font-family: 'Nunito', sans-serif;
+    color: var(--color-text-secondary);
+    padding: var(--space-lg) 0;
+  }
+
+  .admin-denied p {
+    margin-bottom: var(--space-md);
+    font-size: var(--text-base);
+  }
+
+  .btn-link {
+    font-weight: 600;
+    color: var(--color-accent);
+  }
+
+  .admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'Nunito', sans-serif;
+    font-size: var(--text-sm);
+  }
+
+  .admin-table th {
+    text-align: left;
+    padding: 0.5rem 0.75rem;
+    font-weight: 700;
+    color: var(--color-text-muted);
+    border-bottom: 2px solid var(--color-border);
+  }
+
+  .admin-table td {
+    padding: 0.75rem;
+    vertical-align: top;
+    border-bottom: 1px solid var(--color-border);
+    color: var(--color-text-primary);
+  }
+
+  .col-essay { font-weight: 600; white-space: nowrap; }
+  .col-body { max-width: 340px; }
+  .col-date { white-space: nowrap; color: var(--color-text-muted); }
+
+  .col-actions {
+    white-space: nowrap;
+    display: flex;
+    gap: 0.5rem;
+    padding-top: 0.75rem;
+  }
+
+  .btn-approve,
+  .btn-delete {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: var(--text-xs);
+    border: none;
+    padding: 0.3rem 0.75rem;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: opacity var(--transition-fast);
+  }
+
+  .btn-approve {
+    background: #16a34a;
+    color: white;
+  }
+
+  .btn-delete {
+    background: #dc2626;
+    color: white;
+  }
+
+  .btn-approve:hover,
+  .btn-delete:hover {
+    opacity: 0.85;
+  }
+
+  .btn-approve:disabled,
+  .btn-delete:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+</style>

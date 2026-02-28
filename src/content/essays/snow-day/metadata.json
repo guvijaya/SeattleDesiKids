@@ -1,0 +1,51 @@
+{
+  "slug": "snow-day",
+  "englishTitle": "Snow Day",
+  "displayTitles": {
+    "tamil": "பனிவிழும் நாள்",
+    "english": "Snow Day",
+    "hindi": "हिमपात दिवस - Snow day",
+    "telugu": "మంచు కురిసిన రోజు - Snow Day",
+    "marathi": "हिमवर्षाव"
+  },
+  "availableLanguages": [
+    "tamil",
+    "english",
+    "hindi",
+    "telugu",
+    "marathi"
+  ],
+  "originalAuthor": "Guruprasad Vijayarao",
+  "translators": {
+    "tamil": {
+      "name": "Guruprasad Vijayarao",
+      "blog": ""
+    },
+    "english": {
+      "name": "Jayanthi Gowrishankaran",
+      "blog": "https://seattledesikids.blogspot.com"
+    },
+    "hindi": {
+      "name": "Rahul Upadhyaya",
+      "blog": "https://nanhihindi.blogspot.com"
+    },
+    "telugu": {
+      "name": "Pavan Kumar Yerravelly",
+      "blog": "https://seattletelugukids.blogspot.com"
+    },
+    "marathi": {
+      "name": "Mahesh Deshpande",
+      "blog": "https://seattlemarathi.blogspot.com"
+    }
+  },
+  "illustrations": [],
+  "tags": [],
+  "sourceUrls": {
+    "english": "https://seattledesikids.blogspot.com/2022/11/snow-day.html",
+    "hindi": "https://nanhihindi.blogspot.com/2023/12/blog-post_76.html",
+    "telugu": "https://seattletelugukids.blogspot.com/2024/10/snow-day.html",
+    "marathi": "https://seattlemarathi.blogspot.com/2025/03/blog-post_28.html"
+  },
+  "publishedDate": "2026-02-28",
+  "lastUpdated": "2026-02-28"
+}

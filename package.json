@@ -1,0 +1,16 @@
+{
+  "name": "kids-online-book-app",
+  "type": "module",
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "^3.0.0",
+    "@supabase/supabase-js": "^2.98.0",
+    "astro": "^5.18.0",
+    "marked": "^17.0.3"
+  }
+}

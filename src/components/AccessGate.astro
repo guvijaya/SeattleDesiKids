@@ -1,0 +1,150 @@
+---
+/**
+ * AccessGate — wraps essay content.
+ * Free essays: renders slot as-is.
+ * Locked essays: shows content blurred with a "Sign in" overlay until authenticated.
+ */
+interface Props {
+  slug: string;
+  isFree: boolean;
+}
+
+const { slug, isFree } = Astro.props;
+---
+
+{isFree ? (
+  <slot />
+) : (
+  <div
+    class="access-gate access-gate--locked"
+    id="access-gate"
+    data-slug={slug}
+    data-free="false"
+  >
+    <div class="access-content">
+      <slot />
+    </div>
+
+    <div class="access-overlay" id="access-overlay">
+      <div class="access-card">
+        <svg class="access-lock-icon" width="32" height="32" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <rect x="5" y="11" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.5"/>
+          <path d="M8 11V7a4 4 0 018 0v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <p class="access-message">Sign in to read all 24 essays</p>
+        <button class="access-signin-btn" id="access-signin-btn">
+          Sign in with Google
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+<script>
+  import { supabase } from '@/lib/supabase.ts';
+
+  const gate = document.getElementById('access-gate');
+  const overlay = document.getElementById('access-overlay');
+
+  if (gate && overlay) {
+    function unlock() {
+      gate!.classList.remove('access-gate--locked');
+      overlay!.style.display = 'none';
+    }
+    function lock() {
+      gate!.classList.add('access-gate--locked');
+      overlay!.style.display = '';
+    }
+
+    // Check on load
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) unlock();
+
+    // Keep in sync with auth changes
+    supabase.auth.onAuthStateChange((_event, session) => {
+      if (session) unlock(); else lock();
+    });
+
+    // Also listen for the custom event from AuthButton (same page, faster)
+    window.addEventListener('auth-change', (e: Event) => {
+      if ((e as CustomEvent).detail) unlock(); else lock();
+    });
+
+    // Sign-in button inside the overlay
+    document.getElementById('access-signin-btn')?.addEventListener('click', () => {
+      supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: { redirectTo: window.location.href },
+      });
+    });
+  }
+</script>
+
+<style>
+  .access-gate {
+    position: relative;
+  }
+
+  /* Locked state: cut off content with a gradient fade */
+  .access-gate--locked .access-content {
+    max-height: 320px;
+    overflow: hidden;
+    mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
+    user-select: none;
+    pointer-events: none;
+  }
+
+  .access-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    padding-bottom: 0;
+    z-index: 10;
+  }
+
+  .access-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: 2rem 2.5rem;
+    text-align: center;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.12);
+    max-width: 380px;
+    width: 100%;
+  }
+
+  .access-lock-icon {
+    color: var(--color-accent);
+    margin-bottom: 0.75rem;
+  }
+
+  .access-message {
+    font-family: 'Nunito', sans-serif;
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin-bottom: 1.25rem;
+    line-height: 1.4;
+  }
+
+  .access-signin-btn {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: var(--text-sm);
+    color: white;
+    background: var(--color-accent);
+    border: none;
+    padding: 0.625rem 1.5rem;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: opacity var(--transition-fast);
+  }
+
+  .access-signin-btn:hover {
+    opacity: 0.88;
+  }
+</style>

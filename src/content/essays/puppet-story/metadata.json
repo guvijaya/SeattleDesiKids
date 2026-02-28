@@ -1,0 +1,24 @@
+{
+  "slug": "puppet-story",
+  "englishTitle": "Puppet Story",
+  "displayTitles": {
+    "kannada": "ಬೊಂಬೆ ಹೇಳಿದ ಕಥೆ - Puppet Story"
+  },
+  "availableLanguages": [
+    "kannada"
+  ],
+  "originalAuthor": "Guruprasad Vijayarao",
+  "translators": {
+    "kannada": {
+      "name": "Naraya",
+      "blog": "https://muddadakannada.blogspot.com"
+    }
+  },
+  "illustrations": [],
+  "tags": [],
+  "sourceUrls": {
+    "kannada": "https://muddadakannada.blogspot.com/2023/05/blog-post_11.html"
+  },
+  "publishedDate": "2026-02-28",
+  "lastUpdated": "2026-02-28"
+}

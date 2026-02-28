@@ -1,0 +1,45 @@
+{
+  "slug": "train",
+  "englishTitle": "Train",
+  "displayTitles": {
+    "english": "Train",
+    "hindi": "ट्रेन - Train",
+    "telugu": "రైలు బండి - Train",
+    "kannada": "ರೈಲು ಪ್ರಯಾಣ - Train Travel"
+  },
+  "availableLanguages": [
+    "english",
+    "hindi",
+    "telugu",
+    "kannada"
+  ],
+  "originalAuthor": "Guruprasad Vijayarao",
+  "translators": {
+    "english": {
+      "name": "Jayanthi Gowrishankaran",
+      "blog": "https://seattledesikids.blogspot.com"
+    },
+    "hindi": {
+      "name": "Rahul Upadhyaya",
+      "blog": "https://nanhihindi.blogspot.com"
+    },
+    "telugu": {
+      "name": "Pavan Kumar Yerravelly",
+      "blog": "https://seattletelugukids.blogspot.com"
+    },
+    "kannada": {
+      "name": "Naraya",
+      "blog": "https://muddadakannada.blogspot.com"
+    }
+  },
+  "illustrations": [],
+  "tags": [],
+  "sourceUrls": {
+    "english": "https://seattledesikids.blogspot.com/2022/11/train.html",
+    "hindi": "https://nanhihindi.blogspot.com/2023/12/blog-post_69.html",
+    "telugu": "https://seattletelugukids.blogspot.com/2024/12/train.html",
+    "kannada": "https://muddadakannada.blogspot.com/2023/06/blog-post_63.html"
+  },
+  "publishedDate": "2026-02-28",
+  "lastUpdated": "2026-02-28"
+}

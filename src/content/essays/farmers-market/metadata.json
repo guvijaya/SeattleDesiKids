@@ -1,0 +1,58 @@
+{
+  "slug": "farmers-market",
+  "englishTitle": "Farmers’ Market",
+  "displayTitles": {
+    "tamil": "உழவர் சந்தை",
+    "english": "Farmers’ Market",
+    "hindi": "किसान मण्डी - Farmers Market",
+    "telugu": "రైతు బజార్ - Farmers’ Market",
+    "marathi": "शेतकरी बाजार",
+    "kannada": "ರೈತ ಸಂತೆ (Farmer's Market)"
+  },
+  "availableLanguages": [
+    "tamil",
+    "english",
+    "hindi",
+    "telugu",
+    "marathi",
+    "kannada"
+  ],
+  "originalAuthor": "Guruprasad Vijayarao",
+  "translators": {
+    "tamil": {
+      "name": "Guruprasad Vijayarao",
+      "blog": ""
+    },
+    "english": {
+      "name": "Jayanthi Gowrishankaran",
+      "blog": "https://seattledesikids.blogspot.com"
+    },
+    "hindi": {
+      "name": "Rahul Upadhyaya",
+      "blog": "https://nanhihindi.blogspot.com"
+    },
+    "telugu": {
+      "name": "Pavan Kumar Yerravelly",
+      "blog": "https://seattletelugukids.blogspot.com"
+    },
+    "marathi": {
+      "name": "Mahesh Deshpande",
+      "blog": "https://seattlemarathi.blogspot.com"
+    },
+    "kannada": {
+      "name": "Naraya",
+      "blog": "https://muddadakannada.blogspot.com"
+    }
+  },
+  "illustrations": [],
+  "tags": [],
+  "sourceUrls": {
+    "english": "https://seattledesikids.blogspot.com/2022/11/farmers-market.html",
+    "hindi": "https://nanhihindi.blogspot.com/2023/12/blog-post_33.html",
+    "telugu": "https://seattletelugukids.blogspot.com/2024/10/farmers-market.html",
+    "marathi": "https://seattlemarathi.blogspot.com/2025/03/blog-post.html",
+    "kannada": "https://muddadakannada.blogspot.com/2023/06/blog-post_24.html"
+  },
+  "publishedDate": "2026-02-28",
+  "lastUpdated": "2026-02-28"
+}

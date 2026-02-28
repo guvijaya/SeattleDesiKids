@@ -1,0 +1,131 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const translators = [
+  { language: 'English', name: 'Jayanthi Gowrishankaran', blog: 'https://seattledesikids.blogspot.com', color: 'var(--color-lang-en)' },
+  { language: 'Hindi', name: 'Rahul Upadhyaya', blog: 'https://nanhihindi.blogspot.com', color: 'var(--color-lang-hi)' },
+  { language: 'Telugu', name: 'Pavan Kumar Yerravelly', blog: 'https://seattletelugukids.blogspot.com', color: 'var(--color-lang-te)' },
+  { language: 'Marathi', name: 'Anand Hinge & Mahesh Deshpande', blog: 'https://seattlemarathi.blogspot.com', color: 'var(--color-lang-mr)' },
+  { language: 'Kannada', name: 'Lakshminarayanappa Thalagunda', blog: 'https://muddadakannada.blogspot.com', color: 'var(--color-lang-kn)' },
+];
+---
+
+<BaseLayout
+  title="About"
+  description="About Seattle Desi Kids — a multilingual children's essay collection by Guruprasad Vijayarao."
+>
+  <div class="container">
+    <article class="about-page prose">
+      <h1>About Seattle Desi Kids</h1>
+
+      <p>
+        <em>Seattle Desi Kids</em> is a collection of children's essays about growing up and exploring
+        life in the Pacific Northwest. Originally written in <strong>Tamil</strong> by
+        <strong>Guruprasad Vijayarao</strong>, these stories have been lovingly translated into
+        five languages by a community of dedicated writers from the Seattle diaspora.
+      </p>
+
+      <h2>The Book</h2>
+      <p>
+        The essays are also available as a published physical book. Please reach out to Guru for copies —
+        <a href="mailto:guru.kpm@gmail.com">guru.kpm@gmail.com</a>.
+      </p>
+
+      <h2>The Author</h2>
+      <p>
+        <strong>Guruprasad Vijayarao</strong> is the original author of these essays. He can be
+        reached at <a href="mailto:guru.kpm@gmail.com">guru.kpm@gmail.com</a>.
+      </p>
+
+      <h2>Join as a Translator</h2>
+      <p>
+        We warmly welcome translators who can bring these stories to more languages! The goal is
+        simple — make language learning fun and accessible for children everywhere.
+      </p>
+      <p>
+        If you speak a language not yet represented here and would like to contribute, please get
+        in touch with Guru at <a href="mailto:guru.kpm@gmail.com">guru.kpm@gmail.com</a>. Every
+        new translation is a gift to a child discovering their heritage language.
+      </p>
+
+      <h2>The Translators</h2>
+      <p>A heartfelt thank you to all the translators who made these stories accessible in multiple languages:</p>
+
+      <div class="translator-cards">
+        {translators.map(t => (
+          <div class="translator-card">
+            <div class="translator-lang-badge" style={`background: color-mix(in srgb, ${t.color} 15%, transparent); color: ${t.color}; border-color: color-mix(in srgb, ${t.color} 30%, transparent)`}>
+              {t.language}
+            </div>
+            <a href={t.blog} target="_blank" rel="noopener noreferrer" class="translator-name-link">
+              {t.name}
+            </a>
+          </div>
+        ))}
+      </div>
+    </article>
+  </div>
+</BaseLayout>
+
+<style>
+  .about-page {
+    padding-block: var(--space-xl);
+    max-width: var(--reader-width);
+    margin-inline: auto;
+  }
+
+  .book-link {
+    display: inline-block;
+    background: var(--color-accent);
+    color: white !important;
+    padding: 0.625rem 1.25rem;
+    border-radius: var(--radius-sm);
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: var(--text-sm);
+    text-decoration: none !important;
+    transition: background-color var(--transition-fast);
+  }
+
+  .book-link:hover {
+    background: var(--color-accent-hover);
+  }
+
+  .translator-cards {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    margin-top: var(--space-md);
+  }
+
+  .translator-card {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-md);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+  }
+
+  .translator-lang-badge {
+    font-family: 'Nunito', sans-serif;
+    font-size: var(--text-xs);
+    font-weight: 700;
+    padding: 0.25rem 0.75rem;
+    border-radius: 100px;
+    border: 1.5px solid;
+    white-space: nowrap;
+  }
+
+  .translator-name-link {
+    font-size: var(--text-base);
+    color: var(--color-text-primary);
+    font-weight: 600;
+    transition: color var(--transition-fast);
+  }
+
+  .translator-name-link:hover {
+    color: var(--color-accent);
+  }
+</style>

@@ -1,0 +1,350 @@
+---
+/**
+ * MarkAsRead — bottom-of-essay widget.
+ * Only visible to logged-in users. Shows "Mark as Read" → star rating + comment form.
+ */
+interface Props {
+  slug: string;
+  lang: string;
+}
+
+const { slug, lang } = Astro.props;
+---
+
+<div
+  class="mar-section"
+  id="mar-section"
+  data-slug={slug}
+  data-lang={lang}
+  aria-live="polite"
+>
+  <!-- Populated by client JS once auth state is known -->
+</div>
+
+<script>
+  import { supabase } from '@/lib/supabase.ts';
+
+  const section = document.getElementById('mar-section');
+  if (!section) throw new Error('MarkAsRead: section element not found');
+
+  const slug = section.dataset.slug!;
+  const lang = section.dataset.lang!;
+
+  async function init(userId: string) {
+    const { data: existing } = await supabase
+      .from('reading_progress')
+      .select('id, rating')
+      .eq('user_id', userId)
+      .eq('slug', slug)
+      .maybeSingle();
+
+    if (existing) {
+      renderDone(existing.rating);
+    } else {
+      renderButton();
+    }
+  }
+
+  function renderButton() {
+    section!.innerHTML = `
+      <div class="mar-wrapper">
+        <button class="mar-btn" id="mar-btn">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <path d="M3 8l4 4 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Mark as Read
+        </button>
+      </div>
+    `;
+    document.getElementById('mar-btn')?.addEventListener('click', renderForm);
+  }
+
+  function renderForm() {
+    section!.innerHTML = `
+      <div class="mar-form" id="mar-form">
+        <p class="mar-form-label">How did you enjoy this essay?</p>
+        <div class="mar-stars" id="mar-stars" role="group" aria-label="Star rating">
+          ${[1, 2, 3, 4, 5].map(i =>
+            `<button class="star-btn" data-value="${i}" aria-label="${i} star${i > 1 ? 's' : ''}" type="button">★</button>`
+          ).join('')}
+        </div>
+        <textarea
+          class="mar-comment"
+          id="mar-comment"
+          placeholder="Optional comment (submitted for review)…"
+          rows="3"
+          maxlength="1000"
+        ></textarea>
+        <div class="mar-actions">
+          <button class="mar-submit btn-primary" id="mar-submit" disabled>Save</button>
+          <button class="mar-cancel btn-ghost" id="mar-cancel" type="button">Cancel</button>
+        </div>
+        <p class="mar-note" id="mar-note"></p>
+      </div>
+    `;
+
+    let selectedRating = 0;
+    const starsDiv = document.getElementById('mar-stars')!;
+    const submitBtn = document.getElementById('mar-submit') as HTMLButtonElement;
+    const note = document.getElementById('mar-note')!;
+
+    starsDiv.addEventListener('click', e => {
+      const target = e.target as HTMLElement;
+      if (!target.classList.contains('star-btn')) return;
+      selectedRating = parseInt(target.dataset.value!);
+      submitBtn.disabled = false;
+      starsDiv.querySelectorAll('.star-btn').forEach((btn, i) => {
+        btn.classList.toggle('star-active', i < selectedRating);
+      });
+    });
+
+    document.getElementById('mar-cancel')?.addEventListener('click', renderButton);
+
+    submitBtn.addEventListener('click', async () => {
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Saving…';
+      note.textContent = '';
+
+      const comment = (document.getElementById('mar-comment') as HTMLTextAreaElement).value.trim();
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) { note.textContent = 'Please sign in first.'; return; }
+
+      const { error: progressError } = await supabase.from('reading_progress').upsert({
+        user_id: session.user.id,
+        slug,
+        lang,
+        rating: selectedRating,
+        read_at: new Date().toISOString(),
+      }, { onConflict: 'user_id,slug' });
+
+      if (progressError) {
+        note.textContent = 'Error saving progress. Please try again.';
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Save';
+        return;
+      }
+
+      if (comment) {
+        await supabase.from('essay_comments').insert({
+          slug,
+          user_id: session.user.id,
+          display_name: session.user.user_metadata?.full_name || session.user.email || 'Reader',
+          body: comment,
+        });
+      }
+
+      renderDone(selectedRating);
+    });
+  }
+
+  function renderDone(rating: number | null) {
+    const stars = rating
+      ? `<span class="mar-stars-display" aria-label="${rating} out of 5 stars">${'★'.repeat(rating)}${'☆'.repeat(5 - rating)}</span>`
+      : '';
+    section!.innerHTML = `
+      <div class="mar-done">
+        <span class="mar-check" aria-label="Marked as read">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <path d="M3 8l4 4 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Read
+        </span>
+        ${stars}
+        <button class="mar-update-btn" id="mar-update-btn">Update rating</button>
+      </div>
+    `;
+    document.getElementById('mar-update-btn')?.addEventListener('click', renderForm);
+  }
+
+  // Start
+  const { data: { session } } = await supabase.auth.getSession();
+  if (session) await init(session.user.id);
+
+  supabase.auth.onAuthStateChange(async (_event, session) => {
+    if (session) {
+      await init(session.user.id);
+    } else {
+      section!.innerHTML = '';
+    }
+  });
+</script>
+
+<style>
+  .mar-section {
+    max-width: var(--reader-width);
+    margin-inline: auto;
+    margin-top: var(--space-lg);
+    padding-top: var(--space-lg);
+    border-top: 1px solid var(--color-border);
+  }
+
+  .mar-wrapper {
+    display: flex;
+    justify-content: center;
+  }
+
+  .mar-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: var(--text-sm);
+    color: var(--color-accent);
+    background: none;
+    border: 2px solid var(--color-accent);
+    padding: 0.5rem 1.25rem;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: background var(--transition-fast), color var(--transition-fast);
+  }
+
+  .mar-btn:hover {
+    background: var(--color-accent);
+    color: white;
+  }
+
+  .mar-form {
+    background: var(--color-surface-2);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: var(--space-md);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+
+  .mar-form-label {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 600;
+    font-size: var(--text-sm);
+    color: var(--color-text-primary);
+  }
+
+  .mar-stars {
+    display: flex;
+    gap: 0.25rem;
+  }
+
+  .star-btn {
+    font-size: 1.5rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--color-border);
+    transition: color var(--transition-fast), transform var(--transition-fast);
+    padding: 0;
+    line-height: 1;
+  }
+
+  .star-btn:hover,
+  .star-btn.star-active {
+    color: var(--color-accent);
+    transform: scale(1.1);
+  }
+
+  .mar-comment {
+    font-family: 'Nunito', sans-serif;
+    font-size: var(--text-sm);
+    color: var(--color-text-primary);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    padding: 0.5rem 0.75rem;
+    resize: vertical;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .mar-comment:focus {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 1px;
+  }
+
+  .mar-actions {
+    display: flex;
+    gap: var(--space-sm);
+    align-items: center;
+  }
+
+  .mar-submit {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: var(--text-sm);
+    color: white;
+    background: var(--color-accent);
+    border: none;
+    padding: 0.5rem 1.25rem;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: opacity var(--transition-fast);
+  }
+
+  .mar-submit:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  .mar-submit:not(:disabled):hover {
+    opacity: 0.88;
+  }
+
+  .mar-cancel {
+    font-family: 'Nunito', sans-serif;
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.5rem 0.75rem;
+  }
+
+  .mar-cancel:hover {
+    color: var(--color-text-primary);
+  }
+
+  .mar-note {
+    font-family: 'Nunito', sans-serif;
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+    min-height: 1em;
+  }
+
+  .mar-done {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    justify-content: center;
+  }
+
+  .mar-check {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: var(--text-sm);
+    color: #16a34a;
+  }
+
+  .mar-stars-display {
+    font-size: 1.1rem;
+    color: var(--color-accent);
+    letter-spacing: 0.05em;
+  }
+
+  .mar-update-btn {
+    font-family: 'Nunito', sans-serif;
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-decoration: underline;
+    padding: 0;
+  }
+
+  .mar-update-btn:hover {
+    color: var(--color-text-primary);
+  }
+</style>
