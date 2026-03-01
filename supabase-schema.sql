@@ -68,7 +68,40 @@ create policy "Anyone authenticated can update approval"
   using (auth.uid() is not null);
 
 -- ─────────────────────────────────────────────
--- 3. Indexes
+-- 3. Essay view counts (no auth required)
+-- ─────────────────────────────────────────────
+
+create table if not exists essay_views (
+  slug        text primary key,
+  view_count  integer not null default 0
+);
+
+alter table essay_views enable row level security;
+
+-- Anyone can read view counts
+create policy "Public reads essay views"
+  on essay_views for select
+  using (true);
+
+-- Clients never insert/update directly — only via the RPC below.
+
+-- Atomic upsert: insert first visit or increment on return.
+-- security definer runs as the table owner, bypassing RLS.
+create or replace function increment_essay_view(essay_slug text)
+returns void
+language plpgsql
+security definer
+as $$
+begin
+  insert into essay_views (slug, view_count)
+  values (essay_slug, 1)
+  on conflict (slug)
+  do update set view_count = essay_views.view_count + 1;
+end;
+$$;
+
+-- ─────────────────────────────────────────────
+-- 4. Indexes
 -- ─────────────────────────────────────────────
 
 create index if not exists idx_reading_progress_user on reading_progress(user_id);

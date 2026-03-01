@@ -6,6 +6,7 @@ import PencilIllustration from '../../../components/PencilIllustration.astro';
 import AccessGate from '../../../components/AccessGate.astro';
 import MarkAsRead from '../../../components/MarkAsRead.astro';
 import Comments from '../../../components/Comments.astro';
+import ViewCounter from '../../../components/ViewCounter.astro';
 import { LANGUAGES, LANGUAGE_ORDER, type LangCode } from '../../../utils/languages';
 import { FREE_ESSAY_SLUGS } from '../../../lib/freeEssays';
 import fs from 'node:fs';
@@ -118,6 +119,7 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
       {translator && (
         <p class="essay-translator">{currentLang === 'tamil' ? '' : currentLang === 'english' ? 'by ' : 'Translated by '}{translator}</p>
       )}
+      <p class="essay-meta-line"><ViewCounter slug={slug} /></p>
     </header>
 
     <!-- Illustration -->
@@ -152,6 +154,11 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 </BaseLayout>
 
 <style>
+  .essay-meta-line {
+    margin-top: 0.25rem;
+    text-align: center;
+  }
+
   .essay-translator {
     font-family: 'Nunito', sans-serif;
     font-size: var(--text-sm);

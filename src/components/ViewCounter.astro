@@ -1,0 +1,53 @@
+---
+interface Props {
+  slug: string;
+}
+const { slug } = Astro.props;
+---
+
+<span class="view-counter" data-slug={slug} aria-live="polite"></span>
+
+<script>
+  import { supabase } from '@/lib/supabase.ts';
+
+  async function initViewCounter() {
+    const el = document.querySelector<HTMLElement>('.view-counter');
+    if (!el) return;
+    const slug = el.dataset.slug;
+    if (!slug) return;
+
+    // Increment once per browser session per essay
+    const sessionKey = `viewed:${slug}`;
+    if (!sessionStorage.getItem(sessionKey)) {
+      await supabase.rpc('increment_essay_view', { essay_slug: slug });
+      sessionStorage.setItem(sessionKey, '1');
+    }
+
+    // Fetch current count and display it
+    const { data } = await supabase
+      .from('essay_views')
+      .select('view_count')
+      .eq('slug', slug)
+      .single();
+
+    if (data) {
+      const n = data.view_count as number;
+      el.textContent = `${n.toLocaleString()} ${n === 1 ? 'view' : 'views'}`;
+    }
+  }
+
+  initViewCounter();
+</script>
+
+<style>
+  .view-counter {
+    font-family: 'Nunito', sans-serif;
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+  }
+
+  /* Show an eye icon before the count using CSS so no extra HTML is needed */
+  .view-counter:not(:empty)::before {
+    content: '👁 ';
+  }
+</style>
