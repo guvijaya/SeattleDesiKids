@@ -92,6 +92,7 @@ const additionalFonts = langFont ? [`${langFont.replace(/ /g, '+')}:wght@400;600
 
 const langInfo = LANGUAGES[currentLang];
 const isFree = FREE_ESSAY_SLUGS.includes(slug);
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 ---
 
 <BaseLayout
@@ -144,7 +145,7 @@ const isFree = FREE_ESSAY_SLUGS.includes(slug);
 
     <!-- Navigation between essays -->
     <nav class="essay-nav" aria-label="Essay navigation">
-      <a href="/" class="essay-nav-link">← All Essays</a>
+      <a href={`${base}/`} class="essay-nav-link">← All Essays</a>
     </nav>
 
   </div>
