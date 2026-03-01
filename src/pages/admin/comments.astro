@@ -31,7 +31,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 
     <div id="admin-denied" class="admin-denied" style="display:none">
       <p>You are not authorised to view this page.</p>
-      <a href="/" class="btn-link">← Back to essays</a>
+      <a href={import.meta.env.BASE_URL} class="btn-link">← Back to essays</a>
     </div>
   </div>
 </BaseLayout>
