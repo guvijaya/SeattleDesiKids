@@ -51,10 +51,10 @@ essays.sort((a, b) => {
   title="Seattle Desi Kids"
   description="Children's essays in 5 languages — English, Hindi, Telugu, Marathi and Kannada. Original essays by Guruprasad Vijayarao."
   additionalFonts={[
-    'Noto Serif Tamil:wght@400;600',
-    'Noto Serif Devanagari:wght@400;600',
-    'Noto Serif Telugu:wght@400;600',
-    'Noto Serif Kannada:wght@400;600',
+    'Catamaran:wght@600;700',
+    'Hind:wght@400;600',
+    'Noto Sans Telugu:wght@400;600',
+    'Baloo Tamma 2:wght@600;700',
   ]}
 >
   <div class="container">
@@ -223,12 +223,12 @@ essays.sort((a, b) => {
 <script>
   // Per-language metadata needed client-side (font, html lang attribute)
   const langMeta: Record<string, { htmlLang: string; font: string }> = {
-    tamil:   { htmlLang: 'ta', font: "'Noto Serif Tamil', serif" },
+    tamil:   { htmlLang: 'ta', font: "'Catamaran', sans-serif" },
     english: { htmlLang: 'en', font: "'Lora', serif" },
-    hindi:   { htmlLang: 'hi', font: "'Noto Serif Devanagari', serif" },
-    telugu:  { htmlLang: 'te', font: "'Noto Serif Telugu', serif" },
-    marathi: { htmlLang: 'mr', font: "'Noto Serif Devanagari', serif" },
-    kannada: { htmlLang: 'kn', font: "'Noto Serif Kannada', serif" },
+    hindi:   { htmlLang: 'hi', font: "'Hind', sans-serif" },
+    telugu:  { htmlLang: 'te', font: "'Noto Sans Telugu', sans-serif" },
+    marathi: { htmlLang: 'mr', font: "'Hind', sans-serif" },
+    kannada: { htmlLang: 'kn', font: "'Baloo Tamma 2', sans-serif" },
   };
 
   const buttons = document.querySelectorAll<HTMLButtonElement>('.hero-lang');
