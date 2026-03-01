@@ -285,22 +285,24 @@ essays.sort((a, b) => {
     }
   }
 
-  // Initialise count on load
-  applyLang(null);
+  const SESSION_KEY = 'sdk:lang-filter';
+
+  function setActive(lang: string | null) {
+    buttons.forEach(b => b.setAttribute('aria-pressed', b.dataset.lang === lang ? 'true' : 'false'));
+    applyLang(lang);
+    if (lang) sessionStorage.setItem(SESSION_KEY, lang);
+    else sessionStorage.removeItem(SESSION_KEY);
+  }
+
+  // Restore saved filter on load
+  const saved = sessionStorage.getItem(SESSION_KEY);
+  setActive(saved);
 
   buttons.forEach(btn => {
     btn.addEventListener('click', () => {
       const lang     = btn.dataset.lang!;
       const isActive = btn.getAttribute('aria-pressed') === 'true';
-
-      buttons.forEach(b => b.setAttribute('aria-pressed', 'false'));
-
-      if (isActive) {
-        applyLang(null);
-      } else {
-        btn.setAttribute('aria-pressed', 'true');
-        applyLang(lang);
-      }
+      setActive(isActive ? null : lang);
     });
   });
 </script>
