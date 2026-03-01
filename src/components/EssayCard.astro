@@ -32,7 +32,22 @@ const href = `${base}/essays/${slug}/${linkLang}`;
 const initialTitle = displayTitles[linkLang] ?? title;
 ---
 
-<article class="essay-card" data-langs={availableLanguages.join(',')}>
+<article
+  class="essay-card"
+  data-langs={availableLanguages.join(',')}
+  data-title-tamil={displayTitles['tamil'] ?? title}
+  data-title-english={displayTitles['english'] ?? title}
+  data-title-hindi={displayTitles['hindi'] ?? title}
+  data-title-telugu={displayTitles['telugu'] ?? title}
+  data-title-marathi={displayTitles['marathi'] ?? title}
+  data-title-kannada={displayTitles['kannada'] ?? title}
+  data-href-tamil={availableLanguages.includes('tamil') ? `${base}/essays/${slug}/tamil` : ''}
+  data-href-english={availableLanguages.includes('english') ? `${base}/essays/${slug}/english` : ''}
+  data-href-hindi={availableLanguages.includes('hindi') ? `${base}/essays/${slug}/hindi` : ''}
+  data-href-telugu={availableLanguages.includes('telugu') ? `${base}/essays/${slug}/telugu` : ''}
+  data-href-marathi={availableLanguages.includes('marathi') ? `${base}/essays/${slug}/marathi` : ''}
+  data-href-kannada={availableLanguages.includes('kannada') ? `${base}/essays/${slug}/kannada` : ''}
+>
 
   <!-- Clickable area: illustration + title -->
   <a href={href} class="essay-card-link" aria-label={`Read "${initialTitle}"`}>

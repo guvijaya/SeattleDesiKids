@@ -221,40 +221,86 @@ essays.sort((a, b) => {
 </style>
 
 <script>
+  // Per-language metadata needed client-side (font, html lang attribute)
+  const langMeta: Record<string, { htmlLang: string; font: string }> = {
+    tamil:   { htmlLang: 'ta', font: "'Noto Serif Tamil', serif" },
+    english: { htmlLang: 'en', font: "'Lora', serif" },
+    hindi:   { htmlLang: 'hi', font: "'Noto Serif Devanagari', serif" },
+    telugu:  { htmlLang: 'te', font: "'Noto Serif Telugu', serif" },
+    marathi: { htmlLang: 'mr', font: "'Noto Serif Devanagari', serif" },
+    kannada: { htmlLang: 'kn', font: "'Noto Serif Kannada', serif" },
+  };
+
   const buttons = document.querySelectorAll<HTMLButtonElement>('.hero-lang');
-  const cards = document.querySelectorAll<HTMLElement>('.essay-card');
+  const cards   = document.querySelectorAll<HTMLElement>('.essay-card');
   const countEl = document.getElementById('essay-count');
 
-  function updateCount() {
-    const visible = [...cards].filter(c => c.style.display !== 'none').length;
+  function key(lang: string) {
+    // Converts 'tamil' → 'titleTamil' for dataset access
+    return 'title' + lang.charAt(0).toUpperCase() + lang.slice(1);
+  }
+  function hrefKey(lang: string) {
+    return 'href' + lang.charAt(0).toUpperCase() + lang.slice(1);
+  }
+
+  function applyLang(lang: string | null) {
+    cards.forEach(card => {
+      const titleEl  = card.querySelector<HTMLElement>('.essay-card-title');
+      const linkEl   = card.querySelector<HTMLAnchorElement>('.essay-card-link');
+      const langs    = card.dataset.langs?.split(',') ?? [];
+
+      if (lang) {
+        // Filter visibility
+        card.style.display = langs.includes(lang) ? '' : 'none';
+
+        // Update title + link for visible cards
+        if (langs.includes(lang) && titleEl && linkEl) {
+          const meta = langMeta[lang];
+          titleEl.textContent    = (card.dataset[key(lang)] as string) || titleEl.textContent!;
+          titleEl.lang           = meta.htmlLang;
+          titleEl.style.fontFamily = meta.font;
+          const newHref = card.dataset[hrefKey(lang)];
+          if (newHref) linkEl.href = newHref;
+        }
+      } else {
+        // Reset — show all, revert to English title
+        card.style.removeProperty('display');
+        if (titleEl && linkEl) {
+          const meta = langMeta['english'];
+          titleEl.textContent      = (card.dataset[key('english')] as string) || titleEl.textContent!;
+          titleEl.lang             = meta.htmlLang;
+          titleEl.style.fontFamily = meta.font;
+          const engHref = card.dataset[hrefKey('english')];
+          if (engHref) linkEl.href = engHref;
+        }
+      }
+    });
+
+    // Update count
     if (countEl) {
-      countEl.textContent = visible < cards.length ? `(${visible} of ${cards.length})` : `(${cards.length})`;
+      const visible = [...cards].filter(c => c.style.display !== 'none').length;
+      countEl.textContent = visible < cards.length
+        ? `(${visible} of ${cards.length})`
+        : `(${cards.length})`;
     }
   }
 
-  updateCount();
+  // Initialise count on load
+  applyLang(null);
 
   buttons.forEach(btn => {
     btn.addEventListener('click', () => {
-      const lang = btn.dataset.lang!;
+      const lang     = btn.dataset.lang!;
       const isActive = btn.getAttribute('aria-pressed') === 'true';
 
-      // Deselect all buttons
       buttons.forEach(b => b.setAttribute('aria-pressed', 'false'));
 
       if (isActive) {
-        // Toggle off — show everything
-        cards.forEach(card => card.style.removeProperty('display'));
+        applyLang(null);
       } else {
-        // Filter to this language
         btn.setAttribute('aria-pressed', 'true');
-        cards.forEach(card => {
-          const langs = card.dataset.langs?.split(',') ?? [];
-          card.style.display = langs.includes(lang) ? '' : 'none';
-        });
+        applyLang(lang);
       }
-
-      updateCount();
     });
   });
 </script>
