@@ -58,13 +58,13 @@
   });
 </script>
 
-<style>
-  .auth-btn-wrapper {
+<style is:global>
+  #auth-btn-wrapper {
     display: flex;
     align-items: center;
   }
 
-  .auth-signin {
+  #auth-btn-wrapper .auth-signin {
     display: flex;
     align-items: center;
     gap: 0.4rem;
@@ -78,25 +78,26 @@
     border-radius: var(--radius-sm);
     cursor: pointer;
     transition: opacity var(--transition-fast);
+    white-space: nowrap;
   }
 
-  .auth-signin:hover {
+  #auth-btn-wrapper .auth-signin:hover {
     opacity: 0.88;
   }
 
-  .auth-user {
+  #auth-btn-wrapper .auth-user {
     display: flex;
     align-items: center;
     gap: 0.5rem;
   }
 
-  .auth-avatar {
+  #auth-btn-wrapper .auth-avatar {
     border-radius: 50%;
     object-fit: cover;
     border: 2px solid var(--color-border);
   }
 
-  .auth-initials {
+  #auth-btn-wrapper .auth-initials {
     width: 28px;
     height: 28px;
     border-radius: 50%;
@@ -111,14 +112,14 @@
     flex-shrink: 0;
   }
 
-  .auth-name {
+  #auth-btn-wrapper .auth-name {
     font-family: 'Nunito', sans-serif;
     font-size: var(--text-sm);
     font-weight: 600;
     color: var(--color-text-primary);
   }
 
-  .auth-signout {
+  #auth-btn-wrapper .auth-signout {
     font-family: 'Nunito', sans-serif;
     font-size: var(--text-xs);
     font-weight: 600;
@@ -131,7 +132,7 @@
     transition: color var(--transition-fast), border-color var(--transition-fast);
   }
 
-  .auth-signout:hover {
+  #auth-btn-wrapper .auth-signout:hover {
     color: var(--color-text-primary);
     border-color: var(--color-text-muted);
   }
