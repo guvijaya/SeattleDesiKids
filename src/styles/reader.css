@@ -3,7 +3,8 @@
    ============================================ */
 
 .reader-page {
-  padding-block: var(--space-xl);
+  padding-top: var(--space-xl);
+  padding-bottom: var(--space-md);
 }
 
 .reader-header {

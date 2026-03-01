@@ -11,15 +11,7 @@ interface Props {
 const { slug, lang } = Astro.props;
 ---
 
-<div
-  class="mar-section"
-  id="mar-section"
-  data-slug={slug}
-  data-lang={lang}
-  aria-live="polite"
->
-  <!-- Populated by client JS once auth state is known -->
-</div>
+<div class="mar-section" id="mar-section" data-slug={slug} data-lang={lang} aria-live="polite"></div>
 
 <script>
   import { supabase } from '@/lib/supabase.ts';
@@ -199,6 +191,9 @@ const { slug, lang } = Astro.props;
   #mar-section {
     max-width: var(--reader-width);
     margin-inline: auto;
+  }
+
+  #mar-section:not(:empty) {
     margin-top: var(--space-lg);
     padding-top: var(--space-lg);
     border-top: 1px solid var(--color-border);
