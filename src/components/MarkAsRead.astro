@@ -59,20 +59,25 @@ const { slug, lang } = Astro.props;
     document.getElementById('mar-btn')?.addEventListener('click', renderForm);
   }
 
+  const RATING_LABELS = ['', 'Poor', 'Fair', 'Good', 'Great', 'Excellent'];
+
   function renderForm() {
     section!.innerHTML = `
       <div class="mar-form" id="mar-form">
         <p class="mar-form-label">How did you enjoy this essay?</p>
-        <div class="mar-stars" id="mar-stars" role="group" aria-label="Star rating">
-          ${[1, 2, 3, 4, 5].map(i =>
-            `<button class="star-btn" data-value="${i}" aria-label="${i} star${i > 1 ? 's' : ''}" type="button">★</button>`
-          ).join('')}
+        <div class="mar-rating-row">
+          <div class="mar-stars" id="mar-stars" role="group" aria-label="Star rating">
+            ${[1, 2, 3, 4, 5].map(i =>
+              `<button class="star-btn" data-value="${i}" aria-label="${i} star${i > 1 ? 's' : ''}" type="button">★</button>`
+            ).join('')}
+          </div>
+          <span class="mar-rating-label" id="mar-rating-label">Tap a star</span>
         </div>
         <textarea
           class="mar-comment"
           id="mar-comment"
           placeholder="Optional comment (submitted for review)…"
-          rows="3"
+          rows="5"
           maxlength="1000"
         ></textarea>
         <div class="mar-actions">
@@ -85,17 +90,38 @@ const { slug, lang } = Astro.props;
 
     let selectedRating = 0;
     const starsDiv = document.getElementById('mar-stars')!;
+    const ratingLabel = document.getElementById('mar-rating-label')!;
     const submitBtn = document.getElementById('mar-submit') as HTMLButtonElement;
     const note = document.getElementById('mar-note')!;
+
+    function paintStars(fillUpTo: number) {
+      starsDiv.querySelectorAll('.star-btn').forEach((btn, i) => {
+        btn.classList.toggle('star-lit', i < fillUpTo);
+      });
+    }
+
+    // Hover: light up 1..n
+    starsDiv.addEventListener('mouseover', e => {
+      const target = e.target as HTMLElement;
+      if (!target.classList.contains('star-btn')) return;
+      const n = parseInt(target.dataset.value!);
+      paintStars(n);
+      ratingLabel.textContent = RATING_LABELS[n];
+    });
+
+    // Mouse leaves row: revert to selected state
+    starsDiv.addEventListener('mouseleave', () => {
+      paintStars(selectedRating);
+      ratingLabel.textContent = selectedRating ? RATING_LABELS[selectedRating] : 'Tap a star';
+    });
 
     starsDiv.addEventListener('click', e => {
       const target = e.target as HTMLElement;
       if (!target.classList.contains('star-btn')) return;
       selectedRating = parseInt(target.dataset.value!);
       submitBtn.disabled = false;
-      starsDiv.querySelectorAll('.star-btn').forEach((btn, i) => {
-        btn.classList.toggle('star-active', i < selectedRating);
-      });
+      paintStars(selectedRating);
+      ratingLabel.textContent = RATING_LABELS[selectedRating];
     });
 
     document.getElementById('mar-cancel')?.addEventListener('click', renderButton);
@@ -169,8 +195,8 @@ const { slug, lang } = Astro.props;
   });
 </script>
 
-<style>
-  .mar-section {
+<style is:global>
+  #mar-section {
     max-width: var(--reader-width);
     margin-inline: auto;
     margin-top: var(--space-lg);
@@ -178,12 +204,12 @@ const { slug, lang } = Astro.props;
     border-top: 1px solid var(--color-border);
   }
 
-  .mar-wrapper {
+  #mar-section .mar-wrapper {
     display: flex;
     justify-content: center;
   }
 
-  .mar-btn {
+  #mar-section .mar-btn {
     display: inline-flex;
     align-items: center;
     gap: 0.4rem;
@@ -199,12 +225,12 @@ const { slug, lang } = Astro.props;
     transition: background var(--transition-fast), color var(--transition-fast);
   }
 
-  .mar-btn:hover {
+  #mar-section .mar-btn:hover {
     background: var(--color-accent);
     color: white;
   }
 
-  .mar-form {
+  #mar-section .mar-form {
     background: var(--color-surface-2);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-md);
@@ -214,60 +240,75 @@ const { slug, lang } = Astro.props;
     gap: var(--space-sm);
   }
 
-  .mar-form-label {
+  #mar-section .mar-form-label {
     font-family: 'Nunito', sans-serif;
     font-weight: 600;
     font-size: var(--text-sm);
     color: var(--color-text-primary);
   }
 
-  .mar-stars {
+  #mar-section .mar-rating-row {
     display: flex;
-    gap: 0.25rem;
+    align-items: center;
+    gap: 1rem;
   }
 
-  .star-btn {
-    font-size: 1.5rem;
+  #mar-section .mar-stars {
+    display: flex;
+    gap: 0.35rem;
+  }
+
+  #mar-section .star-btn {
+    font-size: 2.25rem;
     background: none;
     border: none;
     cursor: pointer;
-    color: var(--color-border);
-    transition: color var(--transition-fast), transform var(--transition-fast);
-    padding: 0;
+    color: #d1d5db;
+    transition: color 80ms, transform 80ms;
+    padding: 0.1rem;
     line-height: 1;
+    user-select: none;
   }
 
-  .star-btn:hover,
-  .star-btn.star-active {
+  #mar-section .star-btn.star-lit {
     color: var(--color-accent);
-    transform: scale(1.1);
+    transform: scale(1.15);
   }
 
-  .mar-comment {
+  #mar-section .mar-rating-label {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 700;
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    min-width: 6rem;
+  }
+
+  #mar-section .mar-comment {
     font-family: 'Nunito', sans-serif;
     font-size: var(--text-sm);
     color: var(--color-text-primary);
     background: var(--color-surface);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-sm);
-    padding: 0.5rem 0.75rem;
+    padding: 0.625rem 0.875rem;
     resize: vertical;
     width: 100%;
     box-sizing: border-box;
+    line-height: 1.6;
   }
 
-  .mar-comment:focus {
+  #mar-section .mar-comment:focus {
     outline: 2px solid var(--color-accent);
     outline-offset: 1px;
   }
 
-  .mar-actions {
+  #mar-section .mar-actions {
     display: flex;
     gap: var(--space-sm);
     align-items: center;
   }
 
-  .mar-submit {
+  #mar-section .mar-submit {
     font-family: 'Nunito', sans-serif;
     font-weight: 700;
     font-size: var(--text-sm);
@@ -280,16 +321,16 @@ const { slug, lang } = Astro.props;
     transition: opacity var(--transition-fast);
   }
 
-  .mar-submit:disabled {
+  #mar-section .mar-submit:disabled {
     opacity: 0.45;
     cursor: not-allowed;
   }
 
-  .mar-submit:not(:disabled):hover {
+  #mar-section .mar-submit:not(:disabled):hover {
     opacity: 0.88;
   }
 
-  .mar-cancel {
+  #mar-section .mar-cancel {
     font-family: 'Nunito', sans-serif;
     font-size: var(--text-sm);
     color: var(--color-text-muted);
@@ -299,25 +340,25 @@ const { slug, lang } = Astro.props;
     padding: 0.5rem 0.75rem;
   }
 
-  .mar-cancel:hover {
+  #mar-section .mar-cancel:hover {
     color: var(--color-text-primary);
   }
 
-  .mar-note {
+  #mar-section .mar-note {
     font-family: 'Nunito', sans-serif;
     font-size: var(--text-xs);
     color: var(--color-text-muted);
     min-height: 1em;
   }
 
-  .mar-done {
+  #mar-section .mar-done {
     display: flex;
     align-items: center;
     gap: var(--space-sm);
     justify-content: center;
   }
 
-  .mar-check {
+  #mar-section .mar-check {
     display: inline-flex;
     align-items: center;
     gap: 0.3rem;
@@ -327,13 +368,13 @@ const { slug, lang } = Astro.props;
     color: #16a34a;
   }
 
-  .mar-stars-display {
-    font-size: 1.1rem;
+  #mar-section .mar-stars-display {
+    font-size: 1.25rem;
     color: var(--color-accent);
     letter-spacing: 0.05em;
   }
 
-  .mar-update-btn {
+  #mar-section .mar-update-btn {
     font-family: 'Nunito', sans-serif;
     font-size: var(--text-xs);
     color: var(--color-text-muted);
@@ -344,7 +385,7 @@ const { slug, lang } = Astro.props;
     padding: 0;
   }
 
-  .mar-update-btn:hover {
+  #mar-section .mar-update-btn:hover {
     color: var(--color-text-primary);
   }
 </style>
