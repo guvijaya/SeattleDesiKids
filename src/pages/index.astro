@@ -62,37 +62,37 @@ essays.sort((a, b) => {
       <p class="hero-subtitle">
         A collection of children's essays about life in the Pacific Northwest.
       </p>
-      <div class="hero-langs">
-        <span class="hero-lang" style="--lang-color: var(--color-lang-ta)">
+      <div class="hero-langs" role="group" aria-label="Filter by language">
+        <button class="hero-lang" data-lang="tamil" style="--lang-color: var(--color-lang-ta)" aria-pressed="false">
           <span class="hero-lang-native">தமிழ்</span>
           <span class="hero-lang-english">Tamil</span>
-        </span>
-        <span class="hero-lang" style="--lang-color: var(--color-lang-en)">
+        </button>
+        <button class="hero-lang" data-lang="english" style="--lang-color: var(--color-lang-en)" aria-pressed="false">
           <span class="hero-lang-native">English</span>
           <span class="hero-lang-english">English</span>
-        </span>
-        <span class="hero-lang" style="--lang-color: var(--color-lang-hi)">
+        </button>
+        <button class="hero-lang" data-lang="hindi" style="--lang-color: var(--color-lang-hi)" aria-pressed="false">
           <span class="hero-lang-native">हिन्दी</span>
           <span class="hero-lang-english">Hindi</span>
-        </span>
-        <span class="hero-lang" style="--lang-color: var(--color-lang-te)">
+        </button>
+        <button class="hero-lang" data-lang="telugu" style="--lang-color: var(--color-lang-te)" aria-pressed="false">
           <span class="hero-lang-native">తెలుగు</span>
           <span class="hero-lang-english">Telugu</span>
-        </span>
-        <span class="hero-lang" style="--lang-color: var(--color-lang-mr)">
+        </button>
+        <button class="hero-lang" data-lang="marathi" style="--lang-color: var(--color-lang-mr)" aria-pressed="false">
           <span class="hero-lang-native">मराठी</span>
           <span class="hero-lang-english">Marathi</span>
-        </span>
-        <span class="hero-lang" style="--lang-color: var(--color-lang-kn)">
+        </button>
+        <button class="hero-lang" data-lang="kannada" style="--lang-color: var(--color-lang-kn)" aria-pressed="false">
           <span class="hero-lang-native">ಕನ್ನಡ</span>
           <span class="hero-lang-english">Kannada</span>
-        </span>
+        </button>
       </div>
     </section>
 
     {essays.length > 0 ? (
       <section class="essays-section">
-        <h2 class="section-heading">All Essays</h2>
+        <h2 class="section-heading">All Essays <span class="essay-count" id="essay-count"></span></h2>
         <div class="essay-grid">
           {essays.map(essay => (
             <EssayCard
@@ -144,6 +144,23 @@ essays.sort((a, b) => {
     flex-direction: column;
     align-items: center;
     gap: 0.2rem;
+    /* button reset */
+    background: none;
+    border: 2px solid transparent;
+    border-radius: var(--radius-sm);
+    padding: 0.5rem 0.75rem;
+    cursor: pointer;
+    transition: border-color var(--transition-fast), background-color var(--transition-fast);
+  }
+
+  .hero-lang:hover {
+    background: color-mix(in srgb, var(--lang-color) 8%, transparent);
+    border-color: color-mix(in srgb, var(--lang-color) 30%, transparent);
+  }
+
+  .hero-lang[aria-pressed="true"] {
+    background: color-mix(in srgb, var(--lang-color) 12%, transparent);
+    border-color: var(--lang-color);
   }
 
   .hero-lang-native {
@@ -188,4 +205,56 @@ essays.sort((a, b) => {
     border-radius: 4px;
     font-size: 0.875em;
   }
+
+  .section-heading {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+  }
+
+  .essay-count {
+    font-family: 'Nunito', sans-serif;
+    font-size: var(--text-sm);
+    font-weight: 400;
+    color: var(--color-text-muted);
+  }
 </style>
+
+<script>
+  const buttons = document.querySelectorAll<HTMLButtonElement>('.hero-lang');
+  const cards = document.querySelectorAll<HTMLElement>('.essay-card');
+  const countEl = document.getElementById('essay-count');
+
+  function updateCount() {
+    const visible = [...cards].filter(c => c.style.display !== 'none').length;
+    if (countEl) {
+      countEl.textContent = visible < cards.length ? `(${visible} of ${cards.length})` : `(${cards.length})`;
+    }
+  }
+
+  updateCount();
+
+  buttons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const lang = btn.dataset.lang!;
+      const isActive = btn.getAttribute('aria-pressed') === 'true';
+
+      // Deselect all buttons
+      buttons.forEach(b => b.setAttribute('aria-pressed', 'false'));
+
+      if (isActive) {
+        // Toggle off — show everything
+        cards.forEach(card => card.style.removeProperty('display'));
+      } else {
+        // Filter to this language
+        btn.setAttribute('aria-pressed', 'true');
+        cards.forEach(card => {
+          const langs = card.dataset.langs?.split(',') ?? [];
+          card.style.display = langs.includes(lang) ? '' : 'none';
+        });
+      }
+
+      updateCount();
+    });
+  });
+</script>
