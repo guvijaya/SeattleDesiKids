@@ -12,6 +12,7 @@ const essaysDir = path.join(process.cwd(), 'src', 'content', 'essays');
 interface EssayMeta {
   slug: string;
   englishTitle: string;
+  displayTitles: Record<string, string>;
   availableLanguages: LangCode[];
   illustration?: string;
 }
@@ -30,6 +31,7 @@ if (fs.existsSync(essaysDir)) {
       essays.push({
         slug: meta.slug,
         englishTitle: meta.englishTitle,
+        displayTitles: meta.displayTitles || {},
         availableLanguages: meta.availableLanguages || [],
         illustration: meta.illustrations?.[0],
       });
@@ -48,6 +50,12 @@ essays.sort((a, b) => {
 <BaseLayout
   title="Seattle Desi Kids"
   description="Children's essays in 5 languages — English, Hindi, Telugu, Marathi and Kannada. Original essays by Guruprasad Vijayarao."
+  additionalFonts={[
+    'Noto Serif Tamil:wght@400;600',
+    'Noto Serif Devanagari:wght@400;600',
+    'Noto Serif Telugu:wght@400;600',
+    'Noto Serif Kannada:wght@400;600',
+  ]}
 >
   <div class="container">
     <section class="hero">
@@ -90,6 +98,7 @@ essays.sort((a, b) => {
             <EssayCard
               slug={essay.slug}
               title={essay.englishTitle}
+              displayTitles={essay.displayTitles}
               availableLanguages={essay.availableLanguages}
               illustration={essay.illustration}
               isFree={FREE_ESSAY_SLUGS.includes(essay.slug)}
