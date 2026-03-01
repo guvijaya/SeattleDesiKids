@@ -44,7 +44,7 @@ const isAvailable = availableLanguages.includes(currentLang);
         <div class="available-links">
           {availableLanguages.map(lang => (
             <a
-              href={`/essays/${slug}/${lang}`}
+              href={`${import.meta.env.BASE_URL}essays/${slug}/${lang}`}
               class="available-lang-pill"
               style={`--pill-color: ${LANGUAGES[lang].color}`}
             >
