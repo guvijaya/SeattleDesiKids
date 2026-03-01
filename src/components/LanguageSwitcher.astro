@@ -8,6 +8,7 @@ interface Props {
 }
 
 const { currentLang, slug, availableLanguages } = Astro.props;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 ---
 
 <nav class="lang-switcher" aria-label="Language switcher">
@@ -21,7 +22,7 @@ const { currentLang, slug, availableLanguages } = Astro.props;
         <li>
           {isAvailable ? (
             <a
-              href={`${import.meta.env.BASE_URL}essays/${slug}/${lang}`}
+              href={`${base}/essays/${slug}/${lang}`}
               class:list={['lang-tab', { active: isCurrent, available: !isCurrent }]}
               style={`--tab-color: ${info.color}`}
               aria-current={isCurrent ? 'page' : undefined}

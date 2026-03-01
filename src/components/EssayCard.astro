@@ -25,7 +25,8 @@ const {
 const linkLang = availableLanguages.includes(defaultLang)
   ? defaultLang
   : availableLanguages[0];
-const href = `${import.meta.env.BASE_URL}essays/${slug}/${linkLang}`;
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const href = `${base}/essays/${slug}/${linkLang}`;
 ---
 
 <article class="essay-card">
