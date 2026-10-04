@@ -37,9 +37,8 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 </BaseLayout>
 
 <script>
+  import { authErrorMessage, hasAdminClaim, observeAuth } from '@/lib/auth.ts';
   import { supabase } from '@/lib/supabase.ts';
-
-  const ADMIN_USER_ID = import.meta.env.PUBLIC_ADMIN_USER_ID as string;
 
   const statusEl = document.getElementById('admin-status')!;
   const contentEl = document.getElementById('admin-content')!;
@@ -48,14 +47,16 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
   const emptyEl = document.getElementById('admin-empty')!;
   const tableEl = document.getElementById('admin-table') as HTMLTableElement;
   const tbody = document.getElementById('admin-tbody')!;
+  let authVersion = 0;
 
-  async function loadComments() {
+  async function loadComments(version: number) {
     const { data, error } = await supabase
       .from('essay_comments')
       .select('id, slug, display_name, body, created_at')
       .eq('approved', false)
       .order('created_at', { ascending: true });
 
+    if (version !== authVersion) return;
     loadingEl.style.display = 'none';
 
     if (error) {
@@ -128,28 +129,38 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
     return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
 
-  // Auth check
-  const { data: { session } } = await supabase.auth.getSession();
-
-  if (!session) {
-    statusEl.textContent = 'Please sign in with your admin Google account to continue.';
-    deniedEl.style.display = '';
-  } else if (session.user.id !== ADMIN_USER_ID) {
-    statusEl.style.display = 'none';
-    deniedEl.style.display = '';
-  } else {
-    statusEl.style.display = 'none';
-    contentEl.style.display = '';
-    await loadComments();
-  }
-
-  supabase.auth.onAuthStateChange((_event, session) => {
-    if (session && session.user.id === ADMIN_USER_ID) {
-      statusEl.style.display = 'none';
+  try {
+    observeAuth(async user => {
+      const version = ++authVersion;
+      contentEl.style.display = 'none';
       deniedEl.style.display = 'none';
+      tbody.replaceChildren();
+      tableEl.style.display = 'none';
+      emptyEl.style.display = 'none';
+      loadingEl.style.display = '';
+
+      if (!user) {
+        statusEl.textContent = 'Please sign in with an authorized admin account to continue.';
+        deniedEl.style.display = '';
+        return;
+      }
+
+      const isAdmin = await hasAdminClaim(user);
+      if (version !== authVersion) return;
+      if (!isAdmin) {
+        statusEl.style.display = 'none';
+        deniedEl.style.display = '';
+        return;
+      }
+
+      statusEl.style.display = 'none';
       contentEl.style.display = '';
-    }
-  });
+      await loadComments(version);
+    });
+  } catch (error) {
+    statusEl.textContent = authErrorMessage(error);
+    deniedEl.style.display = '';
+  }
 </script>
 
 <style>

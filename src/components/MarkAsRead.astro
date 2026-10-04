@@ -14,22 +14,40 @@ const { slug, lang } = Astro.props;
 <div class="mar-section" id="mar-section" data-slug={slug} data-lang={lang} aria-live="polite"></div>
 
 <script>
+  import { getCurrentUser, hasAuthenticatedRole, observeAuth } from '@/lib/auth.ts';
   import { supabase } from '@/lib/supabase.ts';
+  import { commentRecord, progressRecord } from '@/lib/data-contracts.mjs';
+  import type { User } from 'firebase/auth';
 
   const section = document.getElementById('mar-section');
   if (!section) throw new Error('MarkAsRead: section element not found');
 
   const slug = section.dataset.slug!;
   const lang = section.dataset.lang!;
+  let activeUser: User | null = null;
+  let authVersion = 0;
 
-  async function init(userId: string) {
+  function isCurrent(version: number, userId: string) {
+    return version === authVersion && activeUser?.uid === userId;
+  }
+
+  async function init(user: User, version: number) {
+    if (!(await hasAuthenticatedRole(user)) || !isCurrent(version, user.uid)) {
+      const message = document.createElement('p');
+      message.className = 'mar-note';
+      message.textContent = 'Account data access is still being set up. Sign out and back in after account setup is complete.';
+      section!.replaceChildren(message);
+      return;
+    }
+
     const { data: existing } = await supabase
       .from('reading_progress')
       .select('id, rating')
-      .eq('user_id', userId)
+      .eq('user_id', user.uid)
       .eq('slug', slug)
       .maybeSingle();
 
+    if (!isCurrent(version, user.uid)) return;
     if (existing) {
       renderDone(existing.rating);
     } else {
@@ -124,17 +142,20 @@ const { slug, lang } = Astro.props;
       note.textContent = '';
 
       const comment = (document.getElementById('mar-comment') as HTMLTextAreaElement).value.trim();
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) { note.textContent = 'Please sign in first.'; return; }
+      const user = await getCurrentUser();
+      const version = authVersion;
+      if (!user || !isCurrent(version, user.uid) || !(await hasAuthenticatedRole(user))) {
+        note.textContent = 'Please sign in first.';
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Save';
+        return;
+      }
 
       const { error: progressError } = await supabase.from('reading_progress').upsert({
-        user_id: session.user.id,
-        slug,
-        lang,
-        rating: selectedRating,
-        read_at: new Date().toISOString(),
+        ...progressRecord(user, slug, lang, selectedRating, new Date().toISOString()),
       }, { onConflict: 'user_id,slug' });
 
+      if (!isCurrent(version, user.uid)) return;
       if (progressError) {
         note.textContent = 'Error saving progress. Please try again.';
         submitBtn.disabled = false;
@@ -142,20 +163,18 @@ const { slug, lang } = Astro.props;
         return;
       }
 
+      let commentError = false;
       if (comment) {
-        await supabase.from('essay_comments').insert({
-          slug,
-          user_id: session.user.id,
-          display_name: session.user.user_metadata?.full_name || session.user.email || 'Reader',
-          body: comment,
-        });
+        const { error } = await supabase.from('essay_comments').insert(commentRecord(user, slug, comment));
+        if (!isCurrent(version, user.uid)) return;
+        commentError = !!error;
       }
 
-      renderDone(selectedRating);
+      renderDone(selectedRating, commentError);
     });
   }
 
-  function renderDone(rating: number | null) {
+  function renderDone(rating: number | null, commentError = false) {
     const stars = rating
       ? `<span class="mar-stars-display" aria-label="${rating} out of 5 stars">${'★'.repeat(rating)}${'☆'.repeat(5 - rating)}</span>`
       : '';
@@ -171,20 +190,29 @@ const { slug, lang } = Astro.props;
         <button class="mar-update-btn" id="mar-update-btn">Update rating</button>
       </div>
     `;
+    if (commentError) {
+      const message = document.createElement('p');
+      message.className = 'mar-note';
+      message.textContent = 'Your progress was saved, but the comment could not be submitted.';
+      section!.append(message);
+    }
     document.getElementById('mar-update-btn')?.addEventListener('click', renderForm);
   }
 
-  // Start
-  const { data: { session } } = await supabase.auth.getSession();
-  if (session) await init(session.user.id);
-
-  supabase.auth.onAuthStateChange(async (_event, session) => {
-    if (session) {
-      await init(session.user.id);
-    } else {
-      section!.innerHTML = '';
-    }
-  });
+  try {
+    observeAuth(user => {
+      const version = ++authVersion;
+      activeUser = user;
+      if (user) {
+        void init(user, version);
+      } else {
+        section!.innerHTML = '';
+      }
+    });
+  } catch {
+    activeUser = null;
+    section!.innerHTML = '';
+  }
 </script>
 
 <style is:global>

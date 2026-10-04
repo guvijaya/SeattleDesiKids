@@ -160,7 +160,7 @@ const initialTitle = displayTitles[linkLang] ?? title;
 </style>
 
 <script>
-  import { supabase } from '@/lib/supabase.ts';
+  import { observeAuth } from '@/lib/auth.ts';
 
   // --- Lock badge visibility ---
   function updateLockBadges(loggedIn: boolean) {
@@ -169,10 +169,10 @@ const initialTitle = displayTitles[linkLang] ?? title;
     });
   }
 
-  const { data: { session } } = await supabase.auth.getSession();
-  updateLockBadges(!!session);
-
-  supabase.auth.onAuthStateChange((_event, session) => {
-    updateLockBadges(!!session);
-  });
+  updateLockBadges(false);
+  try {
+    observeAuth(user => updateLockBadges(!!user));
+  } catch {
+    updateLockBadges(false);
+  }
 </script>
