@@ -141,6 +141,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 
       if (!user) {
         statusEl.textContent = 'Please sign in with an authorized admin account to continue.';
+        statusEl.style.display = '';
         deniedEl.style.display = '';
         return;
       }

@@ -16,9 +16,15 @@ alter table essay_comments
 drop policy if exists "Users read own progress" on reading_progress;
 drop policy if exists "Users insert own progress" on reading_progress;
 drop policy if exists "Users update own progress" on reading_progress;
+drop policy if exists "Firebase users read own progress" on reading_progress;
+drop policy if exists "Firebase users insert own progress" on reading_progress;
+drop policy if exists "Firebase users update own progress" on reading_progress;
 create policy "Firebase users read own progress"
   on reading_progress for select
-  using (user_id = (auth.jwt() ->> 'sub'));
+  using (
+    (auth.jwt() ->> 'role') = 'authenticated'
+    and user_id = (auth.jwt() ->> 'sub')
+  );
 create policy "Firebase users insert own progress"
   on reading_progress for insert
   with check (
@@ -40,6 +46,10 @@ drop policy if exists "Public reads approved comments" on essay_comments;
 drop policy if exists "Auth users insert comments" on essay_comments;
 drop policy if exists "Users delete own comments" on essay_comments;
 drop policy if exists "Anyone authenticated can update approval" on essay_comments;
+drop policy if exists "Public reads approved comments and admins read pending" on essay_comments;
+drop policy if exists "Firebase users insert pending comments" on essay_comments;
+drop policy if exists "Owners or admins delete comments" on essay_comments;
+drop policy if exists "Firebase admins update comments" on essay_comments;
 create policy "Public reads approved comments and admins read pending"
   on essay_comments for select
   using (
@@ -59,7 +69,10 @@ create policy "Firebase users insert pending comments"
 create policy "Owners or admins delete comments"
   on essay_comments for delete
   using (
-    user_id = (auth.jwt() ->> 'sub')
+    (
+      (auth.jwt() ->> 'role') = 'authenticated'
+      and user_id = (auth.jwt() ->> 'sub')
+    )
     or (
       (auth.jwt() ->> 'role') = 'authenticated'
       and (auth.jwt() ->> 'admin') = 'true'

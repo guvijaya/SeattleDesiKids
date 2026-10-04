@@ -161,6 +161,7 @@ const initialTitle = displayTitles[linkLang] ?? title;
 
 <script>
   import { observeAuth } from '@/lib/auth.ts';
+  import { isAuthenticated } from '@/lib/data-contracts.mjs';
 
   // --- Lock badge visibility ---
   function updateLockBadges(loggedIn: boolean) {
@@ -171,7 +172,7 @@ const initialTitle = displayTitles[linkLang] ?? title;
 
   updateLockBadges(false);
   try {
-    observeAuth(user => updateLockBadges(!!user));
+    observeAuth(user => updateLockBadges(isAuthenticated(user)));
   } catch {
     updateLockBadges(false);
   }

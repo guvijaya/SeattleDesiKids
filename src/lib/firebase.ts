@@ -1,5 +1,5 @@
-import { getApp, getApps, initializeApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
+import { getApp, getApps, initializeApp } from '@firebase/app';
+import { getAuth } from '@firebase/auth';
 
 const firebaseConfig = {
   apiKey: ['PUBLIC_FIREBASE_API_KEY', import.meta.env.PUBLIC_FIREBASE_API_KEY],

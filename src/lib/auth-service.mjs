@@ -57,7 +57,7 @@ export function createAuthService({ getAuth, onIdTokenChanged, GoogleAuthProvide
   };
 }
 
-export function getUserIdToken(user) {
+export async function getUserIdToken(user) {
   return user ? user.getIdToken() : null;
 }
 

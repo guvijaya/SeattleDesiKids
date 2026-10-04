@@ -1,4 +1,4 @@
-import type { User } from 'firebase/auth';
+import type { User } from '@firebase/auth';
 
 export function createAuthService(dependencies: {
   getAuth: () => unknown;

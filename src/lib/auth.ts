@@ -3,8 +3,8 @@ import {
   onIdTokenChanged,
   signInWithPopup,
   signOut,
-} from 'firebase/auth';
-import type { User } from 'firebase/auth';
+} from '@firebase/auth';
+import type { User } from '@firebase/auth';
 import { createAuthService, authErrorMessage, getUserIdToken } from './auth-service.mjs';
 import {
   hasAdminClaim as includesAdminClaim,

@@ -10,9 +10,10 @@
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.0.0",
+    "@firebase/app": "^0.16.2",
+    "@firebase/auth": "^1.13.6",
     "@supabase/supabase-js": "^2.98.0",
     "astro": "^5.18.0",
-    "firebase": "^12.19.0",
     "marked": "^17.0.3"
   }
 }

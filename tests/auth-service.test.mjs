@@ -5,10 +5,11 @@ import {
   commentRecord,
   hasAdminClaim,
   hasAuthenticatedRole,
+  isAuthenticated,
   progressRecord,
 } from '../src/lib/data-contracts.mjs';
 
-function createFixture() {
+function createFixture(popupFailure = null) {
   let observer;
   const calls = { getAuth: 0, popup: 0, signOut: 0 };
   const auth = { currentUser: null };
@@ -28,6 +29,7 @@ function createFixture() {
     signInWithPopup: async (_auth, provider) => {
       calls.popup++;
       calls.provider = provider;
+      if (popupFailure) throw popupFailure;
       return { user };
     },
     signOut: async () => { calls.signOut++; },
@@ -53,6 +55,8 @@ test('auth restoration waits for Firebase and notifies observers of user changes
   assert.deepEqual(changes, ['firebase-user-123', null]);
   unsubscribe();
   assert.equal(fixture.calls.getAuth, 1);
+  assert.equal(isAuthenticated(fixture.user), true);
+  assert.equal(isAuthenticated(null), false);
 });
 
 test('Google sign-in uses a popup and sign-out clears the Firebase session', async () => {
@@ -73,6 +77,8 @@ test('configuration errors are clear and popup failures distinguish cancellation
   assert.match(authErrorMessage({ code: 'auth/popup-closed-by-user' }), /cancelled/);
   assert.match(authErrorMessage({ code: 'auth/popup-blocked' }), /blocked the sign-in popup/);
   assert.match(authErrorMessage({ code: 'auth/unauthorized-domain' }), /hostname/);
+  const blocked = createFixture({ code: 'auth/popup-blocked' });
+  await assert.rejects(blocked.service.signIn(), error => authErrorMessage(error).includes('blocked the sign-in popup'));
 });
 
 test('progress and comments persist the Firebase UID and safe profile fallback', () => {
@@ -102,7 +108,7 @@ test('only an explicit true Firebase admin custom claim grants the moderation UI
   assert.equal(hasAdminClaim({}), false);
 });
 
-test('Supabase receives the current Firebase ID token and no token when signed out', async () => {
+test('the Supabase access-token callback reads refreshed Firebase ID tokens and returns null when signed out', async () => {
   let token = 'initial-token';
   const user = { getIdToken: async () => token };
   assert.equal(await getUserIdToken(user), 'initial-token');

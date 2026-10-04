@@ -2,6 +2,10 @@ export function progressRecord(user, slug, lang, rating, readAt) {
   return { user_id: user.uid, slug, lang, rating, read_at: readAt };
 }
 
+export function isAuthenticated(user) {
+  return user !== null && user !== undefined;
+}
+
 export function commentRecord(user, slug, body) {
   return {
     user_id: user.uid,

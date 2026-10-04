@@ -17,7 +17,7 @@ const { slug, lang } = Astro.props;
   import { getCurrentUser, hasAuthenticatedRole, observeAuth } from '@/lib/auth.ts';
   import { supabase } from '@/lib/supabase.ts';
   import { commentRecord, progressRecord } from '@/lib/data-contracts.mjs';
-  import type { User } from 'firebase/auth';
+  import type { User } from '@firebase/auth';
 
   const section = document.getElementById('mar-section');
   if (!section) throw new Error('MarkAsRead: section element not found');

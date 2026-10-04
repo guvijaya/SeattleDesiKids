@@ -1,4 +1,4 @@
-import type { User } from 'firebase/auth';
+import type { User } from '@firebase/auth';
 
 export function progressRecord(
   user: Pick<User, 'uid'>,
@@ -7,6 +7,8 @@ export function progressRecord(
   rating: number,
   readAt: string,
 ): { user_id: string; slug: string; lang: string; rating: number; read_at: string };
+
+export function isAuthenticated(user: User | null | undefined): boolean;
 
 export function commentRecord(
   user: Pick<User, 'uid' | 'displayName' | 'email'>,
