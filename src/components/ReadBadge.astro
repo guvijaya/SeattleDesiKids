@@ -25,21 +25,27 @@ const { slug } = Astro.props;
 
 <script>
   import { supabase } from '@/lib/supabase.ts';
+  import { hasAuthenticatedRole, observeAuth } from '@/lib/auth.ts';
+  import type { User } from '@firebase/auth';
 
-  async function syncReadBadges(userId: string | null) {
+  let requestId = 0;
+  async function syncReadBadges(user: User | null) {
+    const currentRequest = ++requestId;
     const badges = document.querySelectorAll<HTMLElement>('.read-badge');
     if (!badges.length) return;
 
     // Hide all first
     badges.forEach(b => (b.style.display = 'none'));
 
-    if (!userId) return;
+    if (!user || !(await hasAuthenticatedRole(user))) return;
+    if (currentRequest !== requestId) return;
 
     const { data } = await supabase
       .from('reading_progress')
       .select('slug')
-      .eq('user_id', userId);
+      .eq('user_id', user.uid);
 
+    if (currentRequest !== requestId) return;
     if (!data?.length) return;
 
     const readSlugs = new Set(data.map((r: { slug: string }) => r.slug));
@@ -50,12 +56,11 @@ const { slug } = Astro.props;
     });
   }
 
-  const { data: { session } } = await supabase.auth.getSession();
-  await syncReadBadges(session?.user?.id ?? null);
-
-  supabase.auth.onAuthStateChange(async (_event, session) => {
-    await syncReadBadges(session?.user?.id ?? null);
-  });
+  try {
+    observeAuth(user => { void syncReadBadges(user); });
+  } catch {
+    await syncReadBadges(null);
+  }
 </script>
 
 <style>

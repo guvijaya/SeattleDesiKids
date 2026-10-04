@@ -41,10 +41,12 @@ const { slug, isFree } = Astro.props;
 )}
 
 <script>
-  import { supabase } from '@/lib/supabase.ts';
+  import { authErrorMessage, observeAuth, signInWithGoogle } from '@/lib/auth.ts';
+  import { isAuthenticated } from '@/lib/data-contracts.mjs';
 
   const gate = document.getElementById('access-gate');
   const overlay = document.getElementById('access-overlay');
+  const signInButton = document.getElementById('access-signin-btn') as HTMLButtonElement | null;
 
   if (gate && overlay) {
     function unlock() {
@@ -56,26 +58,35 @@ const { slug, isFree } = Astro.props;
       overlay!.style.display = '';
     }
 
-    // Check on load
-    const { data: { session } } = await supabase.auth.getSession();
-    if (session) unlock();
-
-    // Keep in sync with auth changes
-    supabase.auth.onAuthStateChange((_event, session) => {
-      if (session) unlock(); else lock();
-    });
-
-    // Also listen for the custom event from AuthButton (same page, faster)
-    window.addEventListener('auth-change', (e: Event) => {
-      if ((e as CustomEvent).detail) unlock(); else lock();
-    });
-
-    // Sign-in button inside the overlay
-    document.getElementById('access-signin-btn')?.addEventListener('click', () => {
-      supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: { redirectTo: window.location.href },
+    try {
+      observeAuth(user => {
+        if (isAuthenticated(user)) unlock(); else lock();
       });
+    } catch {
+      lock();
+    }
+
+    window.addEventListener('auth-change', (event: Event) => {
+      if (isAuthenticated((event as CustomEvent).detail)) unlock(); else lock();
+    });
+
+    signInButton?.addEventListener('click', async () => {
+      if (!signInButton) return;
+      signInButton.disabled = true;
+      let error = gate.querySelector<HTMLElement>('.access-error');
+      if (!error) {
+        error = document.createElement('p');
+        error.className = 'access-error';
+        error.setAttribute('role', 'status');
+        signInButton.after(error);
+      }
+      error.textContent = '';
+      try {
+        await signInWithGoogle();
+      } catch (reason) {
+        error.textContent = authErrorMessage(reason);
+        signInButton.disabled = false;
+      }
     });
   }
 </script>

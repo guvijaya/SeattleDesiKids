@@ -7,58 +7,102 @@
 </div>
 
 <script>
-  import { supabase } from '@/lib/supabase.ts';
+  import { authErrorMessage, hasAuthenticatedRole, observeAuth, signInWithGoogle, signOutUser } from '@/lib/auth.ts';
+  import type { User } from '@firebase/auth';
 
   const wrapper = document.getElementById('auth-btn-wrapper')!;
 
-  function renderUser(user: { user_metadata?: { avatar_url?: string; full_name?: string }; email?: string } | null) {
+  function renderUser(user: User | null) {
+    wrapper.replaceChildren();
     if (user) {
-      const name = user.user_metadata?.full_name || user.email || 'User';
-      const avatar = user.user_metadata?.avatar_url;
-      wrapper.innerHTML = `
-        <div class="auth-user">
-          ${avatar
-            ? `<img src="${avatar}" alt="${name}" class="auth-avatar" width="28" height="28" />`
-            : `<span class="auth-initials">${name[0].toUpperCase()}</span>`
+      const name = user.displayName || user.email || 'User';
+      const profile = document.createElement('div');
+      profile.className = 'auth-user';
+      if (user.photoURL) {
+        try {
+          const avatarUrl = new URL(user.photoURL);
+          if (avatarUrl.protocol === 'https:' || avatarUrl.protocol === 'http:') {
+            const avatar = document.createElement('img');
+            avatar.src = avatarUrl.href;
+            avatar.alt = '';
+            avatar.className = 'auth-avatar';
+            avatar.width = 28;
+            avatar.height = 28;
+            profile.append(avatar);
           }
-          <span class="auth-name">${name.split(' ')[0]}</span>
-          <button class="auth-signout" id="auth-signout" aria-label="Sign out">Sign out</button>
-        </div>
-      `;
-      document.getElementById('auth-signout')?.addEventListener('click', () => {
-        supabase.auth.signOut();
+        } catch {
+          // Ignore an invalid profile image URL.
+        }
+      }
+      if (!profile.querySelector('img')) {
+        const initials = document.createElement('span');
+        initials.className = 'auth-initials';
+        initials.textContent = name[0]?.toUpperCase() || 'U';
+        profile.append(initials);
+      }
+      const label = document.createElement('span');
+      label.className = 'auth-name';
+      label.textContent = name.split(' ')[0];
+      profile.append(label);
+
+      const signOutButton = document.createElement('button');
+      signOutButton.className = 'auth-signout';
+      signOutButton.setAttribute('aria-label', 'Sign out');
+      signOutButton.textContent = 'Sign out';
+      signOutButton.addEventListener('click', async () => {
+        signOutButton.disabled = true;
+        try {
+          await signOutUser();
+        } catch (error) {
+          showError(authErrorMessage(error));
+          signOutButton.disabled = false;
+        }
       });
+      profile.append(signOutButton);
+      wrapper.append(profile);
     } else {
-      wrapper.innerHTML = `
-        <button class="auth-signin" id="auth-signin">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-            <circle cx="8" cy="5" r="3" stroke="currentColor" stroke-width="1.5"/>
-            <path d="M2 14c0-3.314 2.686-6 6-6s6 2.686 6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-          </svg>
-          Sign in
-        </button>
-      `;
-      document.getElementById('auth-signin')?.addEventListener('click', () => {
-        // Always redirect back to the site root so the URL is predictable
-        // and matches the pattern registered in Supabase's Redirect URLs list.
-        const redirectTo = window.location.origin + import.meta.env.BASE_URL;
-        supabase.auth.signInWithOAuth({
-          provider: 'google',
-          options: { redirectTo },
-        });
+      const signInButton = document.createElement('button');
+      signInButton.className = 'auth-signin';
+      signInButton.textContent = 'Sign in';
+      signInButton.addEventListener('click', async () => {
+        signInButton.disabled = true;
+        clearError();
+        try {
+          await signInWithGoogle();
+        } catch (error) {
+          showError(authErrorMessage(error));
+          signInButton.disabled = false;
+        }
       });
+      wrapper.append(signInButton);
     }
   }
 
-  // Initial state
-  const { data: { session } } = await supabase.auth.getSession();
-  renderUser(session?.user ?? null);
+  const errorEl = document.createElement('span');
+  errorEl.className = 'auth-error';
+  errorEl.setAttribute('role', 'status');
+  wrapper.after(errorEl);
+  let currentUserId: string | null = null;
+  function showError(message: string) { errorEl.textContent = message; }
+  function clearError() { errorEl.textContent = ''; }
 
-  // Keep in sync
-  supabase.auth.onAuthStateChange((_event, session) => {
-    renderUser(session?.user ?? null);
-    window.dispatchEvent(new CustomEvent('auth-change', { detail: session }));
-  });
+  try {
+    observeAuth(user => {
+      currentUserId = user?.uid ?? null;
+      renderUser(user);
+      clearError();
+      window.dispatchEvent(new CustomEvent('auth-change', { detail: user }));
+      if (user) {
+        void hasAuthenticatedRole(user).then(hasRole => {
+          if (hasRole || currentUserId !== user.uid) return;
+          showError('Account data access is still being set up. Sign out and back in after setup is complete.');
+        });
+      }
+    });
+  } catch (error) {
+    renderUser(null);
+    showError(authErrorMessage(error));
+  }
 </script>
 
 <style is:global>
@@ -86,6 +130,17 @@
 
   #auth-btn-wrapper .auth-signin:hover {
     opacity: 0.88;
+  }
+
+  #auth-btn-wrapper button:disabled {
+    opacity: 0.6;
+    cursor: wait;
+  }
+
+  .auth-error {
+    color: var(--color-text-muted);
+    font-family: 'Nunito', sans-serif;
+    font-size: var(--text-xs);
   }
 
   #auth-btn-wrapper .auth-user {
