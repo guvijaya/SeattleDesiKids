@@ -3,12 +3,10 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
 import LanguageSwitcher from '../../../components/LanguageSwitcher.astro';
 import EssayContent from '../../../components/EssayContent.astro';
 import PencilIllustration from '../../../components/PencilIllustration.astro';
-import AccessGate from '../../../components/AccessGate.astro';
 import MarkAsRead from '../../../components/MarkAsRead.astro';
 import Comments from '../../../components/Comments.astro';
 import ViewCounter from '../../../components/ViewCounter.astro';
 import { LANGUAGES, LANGUAGE_ORDER, type LangCode } from '../../../utils/languages';
-import { FREE_ESSAY_SLUGS } from '../../../lib/freeEssays';
 import fs from 'node:fs';
 import path from 'node:path';
 import { marked } from 'marked';
@@ -92,7 +90,6 @@ const langFont = LANGUAGES[currentLang].font;
 const additionalFonts = langFont ? [`${langFont.replace(/ /g, '+')}:wght@400;600`] : [];
 
 const langInfo = LANGUAGES[currentLang];
-const isFree = FREE_ESSAY_SLUGS.includes(slug);
 const base = import.meta.env.BASE_URL.replace(/\/$/, '');
 ---
 
@@ -127,16 +124,14 @@ const base = import.meta.env.BASE_URL.replace(/\/$/, '');
       <PencilIllustration slug={slug} variant={1} />
     </div>
 
-    <!-- Essay Body (with access gate for non-free essays) -->
+    <!-- Essay Body -->
     <div class="reader-body">
-      <AccessGate slug={slug} isFree={isFree}>
-        <EssayContent
-          content={htmlContent}
-          currentLang={currentLang}
-          availableLanguages={availableLanguages}
-          slug={slug}
-        />
-      </AccessGate>
+      <EssayContent
+        content={htmlContent}
+        currentLang={currentLang}
+        availableLanguages={availableLanguages}
+        slug={slug}
+      />
     </div>
 
     <!-- Mark as Read widget (logged-in users only) -->

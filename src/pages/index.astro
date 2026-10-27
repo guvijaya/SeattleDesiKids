@@ -2,7 +2,6 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import EssayCard from '../components/EssayCard.astro';
 import { type LangCode } from '../utils/languages';
-import { FREE_ESSAY_SLUGS } from '../lib/freeEssays';
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -101,7 +100,6 @@ essays.sort((a, b) => {
               displayTitles={essay.displayTitles}
               availableLanguages={essay.availableLanguages}
               illustration={essay.illustration}
-              isFree={FREE_ESSAY_SLUGS.includes(essay.slug)}
             />
           ))}
         </div>

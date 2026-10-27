@@ -10,7 +10,6 @@ interface Props {
   availableLanguages: LangCode[];
   defaultLang?: LangCode;
   illustration?: string;
-  isFree?: boolean;
 }
 
 const {
@@ -20,7 +19,6 @@ const {
   availableLanguages,
   defaultLang = 'english',
   illustration,
-  isFree = true,
 } = Astro.props;
 
 // Link to the first available language
@@ -54,14 +52,6 @@ const initialTitle = displayTitles[linkLang] ?? title;
 
     <div class="essay-card-illustration">
       <PencilIllustration slug={slug} variant={1} />
-      {!isFree && (
-        <span class="essay-lock-badge" aria-label="Sign in to read" title="Sign in to read">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <rect x="5" y="11" width="14" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
-            <path d="M8 11V7a4 4 0 018 0v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-          </svg>
-        </span>
-      )}
     </div>
 
     <div class="essay-card-body">
@@ -110,21 +100,6 @@ const initialTitle = displayTitles[linkLang] ?? title;
     justify-content: center;
   }
 
-  .essay-lock-badge {
-    position: absolute;
-    top: 0.5rem;
-    right: 0.5rem;
-    background: rgba(0, 0, 0, 0.55);
-    color: white;
-    border-radius: 50%;
-    width: 26px;
-    height: 26px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-  }
-
   .essay-card-title-row {
     display: flex;
     align-items: flex-start;
@@ -158,21 +133,3 @@ const initialTitle = displayTitles[linkLang] ?? title;
   }
 
 </style>
-
-<script>
-  import { supabase } from '@/lib/supabase.ts';
-
-  // --- Lock badge visibility ---
-  function updateLockBadges(loggedIn: boolean) {
-    document.querySelectorAll<HTMLElement>('.essay-lock-badge').forEach(el => {
-      el.style.display = loggedIn ? 'none' : '';
-    });
-  }
-
-  const { data: { session } } = await supabase.auth.getSession();
-  updateLockBadges(!!session);
-
-  supabase.auth.onAuthStateChange((_event, session) => {
-    updateLockBadges(!!session);
-  });
-</script>
